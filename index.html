@@ -165,19 +165,12 @@
         <h2 class="section-title">Highlights</h2>
         <span class="section-sub">2026 &amp; Classics</span>
       </div>
-      <div style="display:flex;gap:2px;margin-bottom:var(--s-4);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;max-width:480px;" role="tablist" aria-label="Highlight filters">
-        <div class="stream-tab active" role="tab" aria-selected="true" tabindex="0" onclick="filterHL('all',this)" onkeydown="if(event.key==='Enter')filterHL('all',this)" style="padding:6px 14px;font-size:10px;">All</div>
-        <div class="stream-tab" role="tab" aria-selected="false" tabindex="-1" onclick="filterHL('highlights',this)" onkeydown="if(event.key==='Enter')filterHL('highlights',this)" style="padding:6px 14px;font-size:10px;">Highlights</div>
-        <div class="stream-tab" role="tab" aria-selected="false" tabindex="-1" onclick="filterHL('replays',this)" onkeydown="if(event.key==='Enter')filterHL('replays',this)" style="padding:6px 14px;font-size:10px;">Replays</div>
-        <div class="stream-tab" role="tab" aria-selected="false" tabindex="-1" onclick="filterHL('onboards',this)" onkeydown="if(event.key==='Enter')filterHL('onboards',this)" style="padding:6px 14px;font-size:10px;">Onboards</div>
-      </div>
-      <div style="margin-bottom:var(--s-4);">
-        <a href="https://www.youtube.com/@Formula1" target="_blank" rel="noopener" class="btn btn-secondary" style="display:inline-flex;align-items:center;gap:var(--s-2);padding:8px 16px;font-size:11px;">
-          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          More on YouTube
+      <div style="text-align:center;padding:var(--s-6) 0;">
+        <a href="https://www.youtube.com/@Formula1" target="_blank" rel="noopener" class="btn btn-secondary" style="display:inline-flex;align-items:center;gap:var(--s-2);padding:12px 24px;font-size:13px;">
+          <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Watch on YouTube · @Formula1
         </a>
       </div>
-      <div class="highlights-grid" id="hlGrid"></div>
     </section>
 
     <!-- TELEMETRY -->
@@ -502,38 +495,6 @@
     }
 
     // ═══════════════════════════════════════════════
-    //  HIGHLIGHTS
-    // ═══════════════════════════════════════════════
-    function renderHL(list) {
-      document.getElementById('hlGrid').innerHTML = list.map(h => `
-        <div class="highlight-card" onclick="openVid('${h.id}','${h.title.replace(/'/g, "\\'")}')">
-          <div class="highlight-thumb">
-            <img src="https://img.youtube.com/vi/${h.id}/maxresdefault.jpg" alt="${h.title}" loading="lazy" onerror="if(!this.dataset.fb){this.dataset.fb='1';this.src='https://img.youtube.com/vi/${h.id}/mqdefault.jpg'}else{this.closest('.highlight-card').style.display='none'}">
-            <div class="highlight-overlay"></div>
-            <div class="highlight-play"><div class="play-btn-circle"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor;margin-left:2px;"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
-            <div class="highlight-duration">${h.dur || ''}</div>
-          </div>
-          <div class="highlight-info">
-            <div class="highlight-tag">${h.tag}</div>
-            <div class="highlight-title">${h.title}</div>
-            <div class="highlight-meta">${h.race}</div>
-          </div>
-        </div>`).join('');
-    }
-
-    function filterHL(cat, el) {
-      el.parentNode.querySelectorAll('.stream-tab').forEach(t => {
-        t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
-        t.tabIndex = -1;
-      });
-      el.classList.add('active');
-      el.setAttribute('aria-selected', 'true');
-      el.tabIndex = 0;
-      renderHL(cat === 'all' ? HIGHLIGHTS : HIGHLIGHTS.filter(h => h.cat === cat));
-    }
-
-    // ═══════════════════════════════════════════════
     //  VIDEO PLAYER
     // ═══════════════════════════════════════════════
     function openVid(vid, title) {
@@ -719,7 +680,6 @@
     // ═══════════════════════════════════════════════
     updateHeroFromCalendar();
     buildTimingStrip();
-    renderHL(HIGHLIGHTS);
     loadStreams();
     fetchLiveStandings().catch(function() { buildDrivers(); buildCons(); });
   </script>

@@ -130,21 +130,7 @@ const TEAMS = [
   { name: 'Cadillac', c: '#CCCCCC', pts: 0, d1: 'V. Bottas', d1n: 77, d1p: 0, d2: 'S. Pérez', d2n: 11, d2p: 0, logo: '' },
 ];
 
-const HIGHLIGHTS = [
-  { id: 'DcSwqR01Ues', title: '2026 Australian GP — Race Highlights', race: 'Round 1 · Albert Park', tag: 'Race Highlight', dur: '5:42', cat: 'highlights' },
-  { id: 'OTqZK7vpLko', title: '2026 Chinese GP — Sprint Race Highlights', race: 'Round 2 · Shanghai', tag: 'Sprint Race', dur: '4:18', cat: 'highlights' },
-  { id: 'bIGK_bKN1ks', title: '2026 Japanese GP — Race Highlights', race: 'Round 3 · Suzuka', tag: 'Race Highlight', dur: '6:01', cat: 'highlights' },
-  { id: 'UoSIkfVpTW4', title: '2026 Miami GP — Race Highlights', race: 'Round 4 · Miami', tag: 'Race Highlight', dur: '5:55', cat: 'highlights' },
-  { id: 'xYqQGkY3-OU', title: '2026 Canadian GP — Race Highlights', race: 'Round 5 · Montreal', tag: 'Race Highlight', dur: '5:33', cat: 'highlights' },
-  { id: 'Vo6pVPVRc0k', title: '2026 Monaco GP — Race Highlights', race: 'Round 6 · Monaco', tag: 'Race Highlight', dur: '6:14', cat: 'highlights' },
-  { id: 'y3Yj6H6w_h0', title: 'Extended Highlights — 2019 German GP', race: 'Legendary Rain Chaos', tag: 'Classic Replay', dur: '23:14', cat: 'replays' },
-  { id: '77RXPgDr-24', title: '2021 Abu Dhabi GP — Final Laps Replay', race: 'Round 22 · Yas Marina', tag: 'Race Replay', dur: '9:34', cat: 'replays' },
-  { id: 'mY9wHj2rEaU', title: 'Extended Highlights — 2020 Italian GP', race: 'Gasly\'s Victory', tag: 'Classic Replay', dur: '11:21', cat: 'replays' },
-  { id: 'R9K4v03Lq18', title: 'Extended Highlights — 2021 Russian GP', race: 'Sochi Rain Drama', tag: 'Classic Replay', dur: '12:44', cat: 'replays' },
-  { id: 'kYJjT7N6U_M', title: 'Top 10 Overtakes of 2023 F1 Season', race: 'Onboard Compilation', tag: 'Onboard', dur: '13:15', cat: 'onboards' },
-  { id: 't-U5-D_x_d4', title: 'Lando Norris Onboard Pole Lap — Sochi', race: 'Russian GP 2021', tag: 'Onboard', dur: '2:14', cat: 'onboards' },
-  { id: 'hJ1fB9Gz4wA', title: 'Best Team Radio & Heartbreak Moments', race: 'Season Rewind', tag: 'Radio & Analysis', dur: '8:03', cat: 'analysis' },
-];
+const HIGHLIGHTS = [];
 
 const TRACKS = [
   { name: 'Albert Park', country: '🇦🇺', city: 'Melbourne, Australia', img: 'https://www.formula1.com/content/dam/fom-website/2018-redesign-assets/Circuit%20maps%2016x9/Australia_Circuit.png.transform/7col/image.png', laps: 58, len: '5.278 km', lap: '1:20.235', type: 'Street', turns: 16 },
