@@ -102,7 +102,7 @@
               <div class="stream-err-sub">This session may not be live yet.</div>
               <div class="stream-alt-links">
                 <a class="stream-alt-link" href="https://www.formula1.com/en/live.html" target="_blank" rel="noopener">F1.com official live</a>
-                <a class="stream-alt-link" href="https://www.youtube.com/@F1" target="_blank" rel="noopener">F1 YouTube channel</a>
+                <a class="stream-alt-link" href="https://www.youtube.com/@Formula1" target="_blank" rel="noopener">F1 YouTube channel</a>
                 <a class="stream-alt-link" href="https://www.f1tv.formula1.com" target="_blank" rel="noopener">F1 TV Pro</a>
               </div>
             </div>
@@ -163,14 +163,15 @@
       <div class="section-header">
         <span class="section-eyebrow">MEDIA</span>
         <h2 class="section-title">Highlights</h2>
-        <span class="section-sub">2026 &amp; Classics</span>
+        <span class="section-sub">Latest from YouTube</span>
       </div>
-      <div style="text-align:center;padding:var(--s-6) 0;">
-        <a href="https://www.youtube.com/@Formula1" target="_blank" rel="noopener" class="btn btn-secondary" style="display:inline-flex;align-items:center;gap:var(--s-2);padding:12px 24px;font-size:13px;">
-          <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Watch on YouTube · @Formula1
+      <div style="display:flex;align-items:center;gap:var(--s-3);margin-bottom:var(--s-5);flex-wrap:wrap;">
+        <a href="https://www.youtube.com/@Formula1" target="_blank" rel="noopener" class="btn btn-secondary" style="display:inline-flex;align-items:center;gap:var(--s-2);padding:8px 16px;font-size:11px;">
+          <svg viewBox="0 0 24 24" style="width:16px;height:16px;fill:currentColor;"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Channel · @Formula1
         </a>
       </div>
+      <div class="highlights-grid" id="hlGrid"></div>
     </section>
 
     <!-- TELEMETRY -->
@@ -259,19 +260,6 @@
     </footer>
   </div>
 
-  <!-- VIDEO MODAL -->
-  <div class="modal-overlay" id="vModal" onclick="mClose(event)">
-    <div class="modal-box" style="max-width:800px;aspect-ratio:16/9;display:flex;flex-direction:column;">
-      <div class="modal-header">
-        <span class="modal-title" id="mTtl">Highlight</span>
-        <button class="modal-close" onclick="closeVid()" aria-label="Close"><svg class="icon" width="14" height="14" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-      <div class="modal-video" style="flex:1;background:#000;overflow:hidden;position:relative;">
-        <iframe id="mVideoIframe" style="width:100%;height:100%;border:none;" allow="autoplay;fullscreen" allowfullscreen></iframe>
-      </div>
-    </div>
-  </div>
-
   <script src="data.js"></script>
   <script>
     // ═══════════════════════════════════════════════
@@ -340,6 +328,55 @@
       }
     }
 
+    // ═══════════════════════════════════════════════
+    //  YOUTUBE VIDEO CARDS
+    // ═══════════════════════════════════════════════
+    async function loadYouTubeVideos() {
+      var feedUrl = 'https://www.youtube.com/feeds/videos.xml?channel_id=UCB_qr75-ydFVKSF9Dmo6izg';
+      var proxies = ['https://api.allorigins.win/raw?url=', 'https://api.allorigins.io/raw?url=', 'https://corsproxy.io/?url='];
+      var xml = null;
+      for (var p = 0; p < proxies.length; p++) {
+        try {
+          var ctrl = new AbortController();
+          var t = setTimeout(function() { ctrl.abort(); }, 6000);
+          var r = await fetch(proxies[p] + encodeURIComponent(feedUrl), { signal: ctrl.signal });
+          clearTimeout(t);
+          if (r.ok) { xml = await r.text(); break; }
+        } catch (_) {}
+      }
+      if (!xml) return;
+
+      var grid = document.getElementById('hlGrid');
+      if (!grid) return;
+
+      var entries = xml.split('<entry>');
+      var cards = [];
+      for (var i = 1; i < entries.length && cards.length < 12; i++) {
+        var e = entries[i];
+        var idMatch = e.match(/<yt:videoId>([^<]+)<\/yt:videoId>/) || e.match(/<id>yt:video:([^<]+)<\/id>/);
+        var titleMatch = e.match(/<title[^>]*>([^<]+)<\/title>/);
+        var thumbMatch = e.match(/<media:thumbnail[^>]+url="([^"]+)"/);
+        if (!idMatch || !titleMatch) continue;
+        var vid = idMatch[1];
+        var title = titleMatch[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+        var thumb = thumbMatch ? thumbMatch[1] : ('https://img.youtube.com/vi/' + vid + '/mqdefault.jpg');
+        var tLower = title.toLowerCase();
+        if (tLower.indexOf('#shorts') >= 0 || tLower.indexOf('shorts') >= 0) continue;
+        cards.push({ id: vid, title: title, thumb: thumb });
+      }
+
+      if (!cards.length) return;
+      grid.innerHTML = cards.map(function(c) {
+        var escTitle = c.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        return '<div class="highlight-card" onclick="window.open(\'https://www.youtube.com/watch?v=' + c.id + '\',\'_blank\')" style="cursor:pointer;">' +
+          '<div class="highlight-thumb">' +
+          '<img src="' + c.thumb + '" alt="' + escTitle + '" loading="lazy">' +
+          '<div class="highlight-overlay"></div>' +
+          '<div class="highlight-play"><div class="play-btn-circle"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor;margin-left:2px;"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>' +
+          '</div>' +
+          '<div class="highlight-info"><div class="highlight-title">' + c.title + '</div></div></div>';
+      }).join('');
+    }
     // ═══════════════════════════════════════════════
     //  TIMING STRIP — signature element
     // ═══════════════════════════════════════════════
@@ -493,28 +530,6 @@
         </div>`;
       }).join('');
     }
-
-    // ═══════════════════════════════════════════════
-    //  VIDEO PLAYER
-    // ═══════════════════════════════════════════════
-    function openVid(vid, title) {
-      document.getElementById('mTtl').textContent = title;
-      const iframe = document.getElementById('mVideoIframe');
-      if (iframe) iframe.src = 'https://www.youtube.com/embed/' + vid + '?autoplay=1&rel=0';
-      document.getElementById('vModal').classList.add('open');
-    }
-
-    function closeVid() {
-      document.getElementById('vModal').classList.remove('open');
-      const iframe = document.getElementById('mVideoIframe');
-      if (iframe) iframe.src = '';
-    }
-
-    function mClose(e) {
-      if (e.target === document.getElementById('vModal')) closeVid();
-    }
-
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVid(); });
 
     // ═══════════════════════════════════════════════
     //  LIVE STREAMS
@@ -680,6 +695,7 @@
     // ═══════════════════════════════════════════════
     updateHeroFromCalendar();
     buildTimingStrip();
+    loadYouTubeVideos();
     loadStreams();
     fetchLiveStandings().catch(function() { buildDrivers(); buildCons(); });
   </script>
