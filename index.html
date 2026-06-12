@@ -345,7 +345,7 @@
     //  YOUTUBE AUTO-FETCH
     // ═══════════════════════════════════════════════
     async function fetchYouTubeFeed() {
-      const CHANNEL_ID = 'UCB_qr75-ydFVKSF6REaZMBg';
+      const CHANNEL_ID = 'UCB_qr75-ydFVKSF9Dmo6izg';
       const feedUrl = 'https://www.youtube.com/feeds/videos.xml?channel_id=' + CHANNEL_ID;
       const proxies = [
         'https://api.allorigins.win/raw?url=',
@@ -368,6 +368,11 @@
       var entries = doc.querySelectorAll('entry');
       if (!entries.length) return;
 
+      function getTag(el, name) {
+        var ns = el.getElementsByTagNameNS('*', name);
+        return ns && ns.length ? ns[0].textContent : '';
+      }
+
       var existing = new Set();
       for (var e = 0; e < HIGHLIGHTS.length; e++) existing.add(HIGHLIGHTS[e].id);
 
@@ -378,6 +383,8 @@
       }
       raceKeywords['australian'] = CAL[0];
       raceKeywords['spanish'] = CAL[6];
+      raceKeywords['barcelona'] = CAL[6];
+      raceKeywords['catalunya'] = CAL[6];
       raceKeywords['united states'] = CAL[16];
       raceKeywords['mexico city'] = CAL[17];
       raceKeywords['las vegas'] = CAL[19];
@@ -386,9 +393,8 @@
       var newEntries = [];
       for (var i = 0; i < entries.length; i++) {
         var entry = entries[i];
-        var vid = (entry.querySelector('videoId') || entry.querySelector('id') || {}).textContent || '';
-        var title = (entry.querySelector('title') || {}).textContent || '';
-        var published = (entry.querySelector('published') || {}).textContent || '';
+        var vid = getTag(entry, 'videoId') || getTag(entry, 'id') || '';
+        var title = getTag(entry, 'title') || '';
 
         if (!vid || existing.has(vid)) continue;
         if (vid.indexOf(':') > 0) {
