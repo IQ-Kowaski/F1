@@ -99,7 +99,14 @@
 
   <script src="data.js"></script>
   <script>
-    const API_BASE = 'https://f1api.dev/api';
+    const JOLPICA = 'https://api.jolpi.ca/ergast/f1/2026';
+
+    const TEAM_MAP = {
+      'Alpine F1 Team': 'Alpine',
+      'RB F1 Team': 'Racing Bulls',
+      'Haas F1 Team': 'Haas',
+      'Cadillac F1 Team': 'Cadillac'
+    };
 
     function buildStrip() {
       document.getElementById('stripEntries').innerHTML = DRIVERS.slice(0, 10).map((d, i) => {
@@ -109,20 +116,6 @@
         return '<div class="strip-entry"><span class="strip-pos ' + pc + '">' + (i + 1) + '</span><span class="strip-team-dot" style="background:' + c + '"></span><span class="strip-driver">' + d.s + '</span><span class="strip-gap' + (i === 0 ? ' leader' : '') + '">' + gap + '</span></div>';
       }).join('');
     }
-
-    const TEAM_MAP = {
-      'Mercedes Formula 1 Team': 'Mercedes',
-      'Scuderia Ferrari': 'Ferrari',
-      'Red Bull Racing': 'Red Bull',
-      'McLaren Formula 1 Team': 'McLaren',
-      'Alpine F1 Team': 'Alpine',
-      'RB F1 Team': 'Racing Bulls',
-      'Haas F1 Team': 'Haas',
-      'Williams Racing': 'Williams',
-      'Aston Martin F1 Team': 'Aston Martin',
-      'Audi Revolut F1 Team': 'Audi',
-      'Cadillac Formula 1 Team': 'Cadillac'
-    };
 
     function driverFromShort(s) {
       return DRIVERS.find(d => d.s === s);
@@ -165,50 +158,31 @@
     }
 
     async function fetchLiveStandings() {
-      const drvPts = {};
-      const teamPts = {};
+      const [drvRes, conRes] = await Promise.all([
+        fetch(JOLPICA + '/driverstandings/'),
+        fetch(JOLPICA + '/constructorstandings/')
+      ]);
+      if (!drvRes.ok || !conRes.ok) throw new Error('API error');
 
-      for (let r = 1; r <= 8; r++) {
-        try {
-          const res = await fetch(API_BASE + '/2026/' + r + '/race');
-          if (!res.ok) continue;
-          const data = await res.json();
-          const results = data.races.results;
-          if (!results) continue;
-          results.forEach(d => {
-            const s = d.driver.shortName;
-            const team = TEAM_MAP[d.team.teamName] || d.team.teamName;
-            const pts = d.points || 0;
-            drvPts[s] = (drvPts[s] || 0) + pts;
-            teamPts[team] = (teamPts[team] || 0) + pts;
-          });
-        } catch(e) {
-          continue;
-        }
-      }
+      const drvData = await drvRes.json();
+      const conData = await conRes.json();
 
-      const drvKeys = Object.keys(drvPts);
-      if (drvKeys.length === 0) throw new Error('No data');
+      const drvList = drvData.MRData.StandingsTable.StandingsLists[0].DriverStandings;
+      const conList = conData.MRData.StandingsTable.StandingsLists[0].ConstructorStandings;
 
-      const sortedDrivers = drvKeys
-        .map(s => {
-          const d = driverFromShort(s);
-          return d ? { ...d, pts: drvPts[s] } : null;
-        })
-        .filter(Boolean)
-        .sort((a, b) => b.pts - a.pts);
+      if (!drvList || drvList.length === 0) throw new Error('No data');
 
-      const sortedTeams = Object.keys(teamPts)
-        .map(n => {
-          const t = CONS.find(c => c.name === n);
-          if (t) return { ...t, pts: teamPts[n] };
-          const newTeam = { name: n, pts: teamPts[n], c: '#666' };
-          DRIVERS.forEach(d => {
-            if (d.team === n && TEAM_COLORS[n]) newTeam.c = TEAM_COLORS[n];
-          });
-          return newTeam;
-        })
-        .sort((a, b) => b.pts - a.pts);
+      const sortedDrivers = drvList.map(s => {
+        const d = driverFromShort(s.Driver.code);
+        return d ? { ...d, pts: parseInt(s.points) } : null;
+      }).filter(Boolean);
+
+      const sortedTeams = conList.map(s => {
+        const name = TEAM_MAP[s.Constructor.name] || s.Constructor.name;
+        const t = CONS.find(c => c.name === name);
+        if (t) return { ...t, pts: parseInt(s.points) };
+        return { name: name, pts: parseInt(s.points), c: '#666' };
+      });
 
       renderDriverTable(sortedDrivers);
       renderConstructorTable(sortedTeams);
