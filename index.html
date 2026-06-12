@@ -27,7 +27,7 @@
       <li><a href="teams.html">Teams</a></li>
     </ul>
     <div class="nav-right">
-      <span class="nav-round" id="navRound">Rd 7 · Spain</span>
+      <span class="nav-round" id="navRound"></span>
       <div class="live-pill">
         <span class="live-dot"></span>
         <span id="liveTxt">Live</span>
@@ -49,18 +49,18 @@
     <!-- HERO -->
     <section class="hero" id="home">
       <div class="hero-inner">
-        <div class="hero-eyebrow">This Weekend</div>
-        <h1 class="hero-title">Spanish Grand <em>Prix</em></h1>
+        <div class="hero-eyebrow" id="heroEyebrow"></div>
+        <h1 class="hero-title" id="heroTitle"></h1>
         <div class="hero-meta">
-          <span class="hero-circuit">Circuit de Barcelona-Catalunya</span>
-          <span class="hero-dates">Jun 12–14</span>
-          <span class="hero-status live">This Weekend</span>
+          <span class="hero-circuit" id="heroCircuit"></span>
+          <span class="hero-dates" id="heroDates"></span>
+          <span class="hero-status" id="heroStatus"></span>
         </div>
         <div class="hero-ctas">
           <a href="#streams" class="btn btn-primary">Watch Live</a>
           <a href="standings.html" class="btn btn-secondary">Championship</a>
         </div>
-        <div class="hero-round">R7</div>
+        <div class="hero-round" id="heroRound"></div>
       </div>
     </section>
 
@@ -121,7 +121,7 @@
     <section class="section fade-in">
       <div class="section-header">
         <span class="section-eyebrow">SCHEDULE</span>
-        <h2 class="section-title">Barcelona Weekend</h2>
+        <h2 class="section-title" id="schedTitle"></h2>
         <span class="section-sub">All times local</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:var(--s-3);" id="schedGrid">
@@ -276,6 +276,72 @@
   <script src="data.js"></script>
   <script>
     // ═══════════════════════════════════════════════
+    //  CALENDAR-DRIVEN HERO
+    // ═══════════════════════════════════════════════
+    const RACE_NAMES = {
+      'Australian GP': 'Australian Grand <em>Prix</em>',
+      'Chinese GP': 'Chinese Grand <em>Prix</em>',
+      'Japanese GP': 'Japanese Grand <em>Prix</em>',
+      'Bahrain GP': 'Bahrain Grand <em>Prix</em>',
+      'Saudi Arabian GP': 'Saudi Arabian Grand <em>Prix</em>',
+      'Miami GP': 'Miami Grand <em>Prix</em>',
+      'Canadian GP': 'Canadian Grand <em>Prix</em>',
+      'Monaco GP': 'Monaco Grand <em>Prix</em>',
+      'Barcelona GP': 'Spanish Grand <em>Prix</em>',
+      'Austrian GP': 'Austrian Grand <em>Prix</em>',
+      'British GP': 'British Grand <em>Prix</em>',
+      'Belgian GP': 'Belgian Grand <em>Prix</em>',
+      'Hungarian GP': 'Hungarian Grand <em>Prix</em>',
+      'Dutch GP': 'Dutch Grand <em>Prix</em>',
+      'Italian GP': 'Italian Grand <em>Prix</em>',
+      'Madrid GP': 'Madrid Grand <em>Prix</em>',
+      'Azerbaijan GP': 'Azerbaijan Grand <em>Prix</em>',
+      'Singapore GP': 'Singapore Grand <em>Prix</em>',
+      'US GP': 'United States Grand <em>Prix</em>',
+      'Mexico GP': 'Mexico City Grand <em>Prix</em>',
+      'São Paulo GP': 'São Paulo Grand <em>Prix</em>',
+      'Las Vegas GP': 'Las Vegas Grand <em>Prix</em>',
+      'Qatar GP': 'Qatar Grand <em>Prix</em>',
+      'Abu Dhabi GP': 'Abu Dhabi Grand <em>Prix</em>'
+    };
+
+    function updateHeroFromCalendar() {
+      const race = CAL.find(r => r.st === 'current') || CAL.find(r => r.st === 'upcoming') || CAL[CAL.length - 1];
+      if (!race) return;
+      const nm = race.nm;
+      const fullName = RACE_NAMES[nm] || nm.replace(' GP', ' Grand Prix');
+      const shortName = nm.replace(' GP', '');
+      document.getElementById('navRound').textContent = 'Rd ' + race.rd + ' · ' + shortName;
+      document.getElementById('heroTitle').innerHTML = fullName;
+      document.getElementById('heroCircuit').textContent = race.circ;
+      document.getElementById('heroDates').textContent = race.dates;
+      document.getElementById('heroRound').textContent = 'R' + race.rd;
+      const se = document.getElementById('heroStatus');
+      if (race.st === 'current') {
+        se.textContent = 'This Weekend'; se.className = 'hero-status live';
+        document.getElementById('heroEyebrow').textContent = 'This Weekend';
+      } else if (race.st === 'done') {
+        se.textContent = 'Completed'; se.className = 'hero-status';
+        document.getElementById('heroEyebrow').textContent = 'Last Race';
+      } else {
+        se.textContent = 'Upcoming'; se.className = 'hero-status';
+        document.getElementById('heroEyebrow').textContent = 'Next Race';
+      }
+      document.getElementById('schedTitle').textContent = shortName + ' Weekend';
+      if (race.sched) {
+        const labels = { fp1: 'FP1', fp2: 'FP2', fp3: 'FP3', sq: 'Sprint Quali', sr: 'Sprint Race', q: 'Qualifying', r: 'Race' };
+        const types = { fp1: 'Practice', fp2: 'Practice', fp3: 'Practice', sq: 'Sprint', sr: 'Sprint', q: 'Qualifying', r: 'Race' };
+        document.getElementById('schedGrid').innerHTML = Object.keys(race.sched).map(k => {
+          const h = k === 'r';
+          return '<div style="border:1px solid var(--border);border-radius:var(--r);padding:var(--s-4);background:var(--bg-elevated);' + (h ? 'border-color:var(--red-dim);background:var(--red-dim);' : '') + '">' +
+            '<div style="font-family:var(--mono);font-size:9px;color:' + (h ? 'var(--red)' : 'var(--text-tertiary)') + ';letter-spacing:1.5px;text-transform:uppercase;">' + (labels[k] || k) + '</div>' +
+            '<div style="font-family:var(--display);font-size:24px;font-weight:700;margin:var(--s-1) 0;' + (h ? 'color:var(--red);' : '') + '">' + race.sched[k] + '</div>' +
+            '<div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">' + (types[k] || 'Session') + '</div></div>';
+        }).join('');
+      }
+    }
+
+    // ═══════════════════════════════════════════════
     //  TIMING STRIP — signature element
     // ═══════════════════════════════════════════════
     function buildTimingStrip() {
@@ -296,24 +362,8 @@
     }
 
     // ═══════════════════════════════════════════════
-    //  SCHEDULE
+    //  SCHEDULE (now built by updateHeroFromCalendar)
     // ═══════════════════════════════════════════════
-    function buildSchedule() {
-      const sessions = [
-        { label: 'FP1', time: 'Thu 10:30', type: 'Practice' },
-        { label: 'FP2', time: 'Thu 14:00', type: 'Practice' },
-        { label: 'FP3', time: 'Sat 10:30', type: 'Practice' },
-        { label: 'Qualifying', time: 'Sat 14:00', type: 'Qualifying' },
-        { label: 'Race', time: 'Sun 13:00', type: 'Race', highlight: true },
-      ];
-      document.getElementById('schedGrid').innerHTML = sessions.map(s => `
-        <div style="border:1px solid var(--border);border-radius:var(--r);padding:var(--s-4);background:var(--bg-elevated);${s.highlight ? 'border-color:var(--red-dim);background:var(--red-dim);' : ''}">
-          <div style="font-family:var(--mono);font-size:9px;color:${s.highlight ? 'var(--red)' : 'var(--text-tertiary)'};letter-spacing:1.5px;text-transform:uppercase;">${s.label}</div>
-          <div style="font-family:var(--display);font-size:24px;font-weight:700;margin:var(--s-1) 0;${s.highlight ? 'color:var(--red);' : ''}">${s.time}</div>
-          <div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">${s.type}</div>
-        </div>
-      `).join('');
-    }
 
     // ═══════════════════════════════════════════════
     //  STANDINGS
@@ -661,8 +711,8 @@
     // ═══════════════════════════════════════════════
     //  INIT
     // ═══════════════════════════════════════════════
+    updateHeroFromCalendar();
     buildTimingStrip();
-    buildSchedule();
     renderHL(HIGHLIGHTS);
     loadStreams();
     fetchLiveStandings().catch(function() { buildDrivers(); buildCons(); });
