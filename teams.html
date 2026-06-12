@@ -16,10 +16,11 @@
       <li><a href="standings.html">Standings</a></li>
       <li><a href="drivers.html">Drivers</a></li>
       <li><a href="calendar.html">Calendar</a></li>
+      <li><a href="results.html">Results</a></li>
       <li><a href="tracks.html">Tracks</a></li>
       <li><a href="teams.html" class="active">Teams</a></li>
     </ul>
-    <div class="nav-right"><span class="nav-round">11 Constructors</span><div class="live-pill"><span class="live-dot"></span><span>2026</span></div></div>
+    <div class="nav-right"><span class="nav-round" id="navRound">11 Constructors</span><div class="live-pill"><span class="live-dot"></span><span>2026</span></div></div>
   </nav>
   <div class="timing-strip"><div class="timing-strip-inner"><span class="strip-label" aria-hidden="true">Teams</span><div class="strip-entries" id="stripEntries" aria-live="polite" aria-label="Teams list"></div></div></div>
   <div class="page-wrap" id="main-content">
@@ -92,7 +93,14 @@
         '</div></div>'
       ).join('');
     }
+    function updateNavFromCalendar() {
+      var race = CAL.find(function(r) { return r.st === 'current'; }) || CAL.find(function(r) { return r.st === 'upcoming'; }) || CAL[CAL.length - 1];
+      if (!race) return;
+      var el = document.getElementById('navRound');
+      if (el) el.textContent = 'Rd ' + race.rd + ' \u00b7 ' + race.nm.replace(' GP', '');
+    }
     buildStrip();
+    updateNavFromCalendar();
     buildTeams();
   </script>
 </body>

@@ -16,10 +16,11 @@
       <li><a href="standings.html">Standings</a></li>
       <li><a href="drivers.html">Drivers</a></li>
       <li><a href="calendar.html" class="active">Calendar</a></li>
+      <li><a href="results.html">Results</a></li>
       <li><a href="tracks.html">Tracks</a></li>
       <li><a href="teams.html">Teams</a></li>
     </ul>
-    <div class="nav-right"><span class="nav-round">22 Rounds</span><div class="live-pill"><span class="live-dot"></span><span>2026</span></div></div>
+    <div class="nav-right"><span class="nav-round" id="navRound">22 Rounds</span><div class="live-pill"><span class="live-dot"></span><span>2026</span></div></div>
   </nav>
   <div class="timing-strip"><div class="timing-strip-inner"><span class="strip-label" aria-hidden="true">Race</span><div class="strip-entries" id="stripEntries" aria-live="polite" aria-label="Live timing positions"></div></div></div>
   <div class="page-wrap" id="main-content">
@@ -63,7 +64,14 @@
           '<div class="race-bottom"><div class="race-dates">' + r.dates + '</div><div class="race-status ' + sm[r.st] + '">' + sl[r.st] + '</div></div></div>';
       }).join('');
     }
+    function updateNavFromCalendar() {
+      var race = CAL.find(function(r) { return r.st === 'current'; }) || CAL.find(function(r) { return r.st === 'upcoming'; }) || CAL[CAL.length - 1];
+      if (!race) return;
+      var el = document.getElementById('navRound');
+      if (el) el.textContent = 'Rd ' + race.rd + ' \u00b7 ' + race.nm.replace(' GP', '');
+    }
     buildStrip();
+    updateNavFromCalendar();
     buildCal();
   </script>
 </body>

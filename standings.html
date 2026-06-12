@@ -21,11 +21,12 @@
       <li><a href="standings.html" class="active">Standings</a></li>
       <li><a href="drivers.html">Drivers</a></li>
       <li><a href="calendar.html">Calendar</a></li>
+      <li><a href="results.html">Results</a></li>
       <li><a href="tracks.html">Tracks</a></li>
       <li><a href="teams.html">Teams</a></li>
     </ul>
     <div class="nav-right">
-      <span class="nav-round">After Rd 6 · Monaco</span>
+      <span class="nav-round" id="navRound">After Rd 6 · Monaco</span>
       <div class="live-pill"><span class="live-dot"></span><span>Standings</span></div>
     </div>
   </nav>
@@ -229,7 +230,15 @@
       }).join('');
     }
 
+    function updateNavFromCalendar() {
+      var race = CAL.find(function(r) { return r.st === 'current'; }) || CAL.find(function(r) { return r.st === 'upcoming'; }) || CAL[CAL.length - 1];
+      if (!race) return;
+      var el = document.getElementById('navRound');
+      if (el) el.textContent = 'Rd ' + race.rd + ' \u00b7 ' + race.nm.replace(' GP', '');
+    }
+
     buildStrip();
+    updateNavFromCalendar();
     fetchLiveStandings().catch(buildFallback);
   </script>
 </body>

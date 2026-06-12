@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Results · F1 2026 — APEX</title>
+  <link rel="icon" type="image/x-icon" href="f1-logo.svg">
+  <meta name="description" content="Full 2026 Formula 1 race results — final classifications, qualifying, sprint sessions, and pole positions for every round.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="f1-logo.svg" alt="F1" style="height:24px;width:auto;">
+      <span class="nav-logo-text"><em>APEX</em></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Live</a></li>
+      <li><a href="standings.html">Standings</a></li>
+      <li><a href="results.html" class="active">Results</a></li>
+      <li><a href="drivers.html">Drivers</a></li>
+      <li><a href="calendar.html">Calendar</a></li>
+      <li><a href="tracks.html">Tracks</a></li>
+      <li><a href="teams.html">Teams</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-round" id="navRound"></span>
+      <div class="live-pill"><span class="live-dot"></span><span>Results</span></div>
+    </div>
+  </nav>
+
+  <div class="timing-strip">
+    <div class="timing-strip-inner">
+      <span class="strip-label" aria-hidden="true">Positions</span>
+      <div class="strip-entries" id="stripEntries" aria-live="polite" aria-label="Live timing positions"></div>
+    </div>
+  </div>
+
+  <div class="page-wrap" id="main-content">
+    <section class="section">
+      <div class="section-header">
+        <span class="section-eyebrow">RACE RESULTS</span>
+        <h1 class="section-title">2026 Season</h1>
+        <span class="section-sub" id="resultSub">Select a round</span>
+      </div>
+
+      <div id="roundSelector"></div>
+      <div id="resultsArea"><div style="text-align:center;padding:var(--s-6);color:var(--text-muted);font-family:var(--mono);font-size:11px;">Loading results...</div></div>
+    </section>
+
+    <footer>
+      <div class="footer-logo"><img src="f1-logo.svg" style="height:18px;display:inline-block;vertical-align:middle;margin-right:6px;"><em>APEX</em></div>
+      <div class="footer-links"><a href="https://www.formula1.com" target="_blank" rel="noopener">Official F1</a><a href="https://www.youtube.com/@F1" target="_blank" rel="noopener">F1 YouTube</a><a href="https://www.f1tv.formula1.com" target="_blank" rel="noopener">F1 TV</a></div>
+      <div class="footer-note">Data: Jolpica API · 2026 F1 World Championship</div>
+    </footer>
+  </div>
+
+  <script src="data.js"></script>
+  <script>
+    const TEAM_MAP = {
+      'Alpine F1 Team': 'Alpine', 'RB F1 Team': 'Racing Bulls',
+      'Haas F1 Team': 'Haas', 'Cadillac F1 Team': 'Cadillac'
+    };
+    function mapTeam(n) { return TEAM_MAP[n] || n; }
+
+    const RACE_NAMES = {
+      'Australian GP': 'Australian Grand <em>Prix</em>',
+      'Chinese GP': 'Chinese Grand <em>Prix</em>',
+      'Japanese GP': 'Japanese Grand <em>Prix</em>',
+      'Bahrain GP': 'Bahrain Grand <em>Prix</em>',
+      'Saudi Arabian GP': 'Saudi Arabian Grand <em>Prix</em>',
+      'Miami GP': 'Miami Grand <em>Prix</em>',
+      'Canadian GP': 'Canadian Grand <em>Prix</em>',
+      'Monaco GP': 'Monaco Grand <em>Prix</em>',
+      'Barcelona GP': 'Spanish Grand <em>Prix</em>',
+      'Austrian GP': 'Austrian Grand <em>Prix</em>',
+      'British GP': 'British Grand <em>Prix</em>',
+      'Belgian GP': 'Belgian Grand <em>Prix</em>',
+      'Hungarian GP': 'Hungarian Grand <em>Prix</em>',
+      'Dutch GP': 'Dutch Grand <em>Prix</em>',
+      'Italian GP': 'Italian Grand <em>Prix</em>',
+      'Madrid GP': 'Madrid Grand <em>Prix</em>',
+      'Azerbaijan GP': 'Azerbaijan Grand <em>Prix</em>',
+      'Singapore GP': 'Singapore Grand <em>Prix</em>',
+      'US GP': 'United States Grand <em>Prix</em>',
+      'Mexico GP': 'Mexico City Grand <em>Prix</em>',
+      'Sao Paulo GP': 'Sao Paulo Grand <em>Prix</em>',
+      'Las Vegas GP': 'Las Vegas Grand <em>Prix</em>',
+      'Qatar GP': 'Qatar Grand <em>Prix</em>',
+      'Abu Dhabi GP': 'Abu Dhabi Grand <em>Prix</em>'
+    };
+
+    function updateNavFromCalendar() {
+      const race = CAL.find(function(r) { return r.st === 'current'; }) || CAL.find(function(r) { return r.st === 'upcoming'; }) || CAL[CAL.length - 1];
+      if (!race) return;
+      var el = document.getElementById('navRound');
+      if (el) el.textContent = 'Rd ' + race.rd + ' \u00b7 ' + race.nm.replace(' GP', '');
+    }
+
+    function buildStrip() {
+      document.getElementById('stripEntries').innerHTML = DRIVERS.slice(0, 10).map(function(d, i) {
+        var c = TEAM_COLORS[d.team] || '#666';
+        var gap = i === 0 ? 'LEAD' : '+' + (1 + i * 2).toFixed(1);
+        return '<div class="strip-entry"><span class="strip-pos ' + (i === 0 ? 'p1' : i === 1 ? 'p2' : i === 2 ? 'p3' : '') + '">' + (i + 1) + '</span><span class="strip-team-dot" style="background:' + c + '"></span><span class="strip-driver">' + d.s + '</span><span class="strip-gap' + (i === 0 ? ' leader' : '') + '">' + gap + '</span></div>';
+      }).join('');
+    }
+
+    var LOADED = {};
+
+    function loadRound(rd) {
+      var area = document.getElementById('resultsArea');
+      area.innerHTML = '<div style="text-align:center;padding:var(--s-6);color:var(--text-muted);font-family:var(--mono);font-size:11px;">Loading round ' + rd + '...</div>';
+
+      var race = CAL[rd - 1];
+      if (race) {
+        document.getElementById('resultSub').textContent = 'Round ' + rd + ' \u00b7 ' + race.nm.replace(' GP', '');
+      }
+
+      var buttons = document.querySelectorAll('#roundSelector .rs-btn');
+      for (var b = 0; b < buttons.length; b++) {
+        buttons[b].classList.toggle('active', parseInt(buttons[b].dataset.rd) === rd);
+      }
+
+      var resultsP = fetch('https://api.jolpi.ca/ergast/f1/2026/' + rd + '/results.json').then(function(r) { return r.json(); }).then(function(d) {
+        var races = d.MRData.RaceTable.Races;
+        return races && races.length ? races[0] : null;
+      });
+      var qualiP = fetch('https://api.jolpi.ca/ergast/f1/2026/' + rd + '/qualifying.json').then(function(r) { return r.json(); }).then(function(d) {
+        var races = d.MRData.RaceTable.Races;
+        return races && races.length ? races[0] : null;
+      });
+      var sprintP = fetch('https://api.jolpi.ca/ergast/f1/2026/' + rd + '/sprint.json').then(function(r) { return r.json(); }).then(function(d) {
+        var races = d.MRData.RaceTable.Races;
+        return races && races.length ? races[0] : null;
+      });
+
+      Promise.all([resultsP, qualiP, sprintP]).then(function(results) {
+        var raceData = results[0], qualiData = results[1], sprintData = results[2];
+        if (!raceData && !qualiData) {
+          area.innerHTML = '<div class="info-panel" style="text-align:center;padding:var(--s-6);color:var(--text-muted);font-family:var(--mono);font-size:11px;">No results available for round ' + rd + '.</div>';
+          return;
+        }
+
+        var html = '';
+        var rName = raceData ? raceData.raceName : (qualiData ? qualiData.raceName : 'Round ' + rd);
+        var circuitName = raceData ? raceData.Circuit.circuitName : (qualiData ? qualiData.Circuit.circuitName : '');
+        var rDate = raceData ? raceData.date : (qualiData ? qualiData.date : '');
+        var dateStr = '';
+        if (rDate) {
+          var parts = rDate.split('-');
+          var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+          dateStr = parts[2] + ' ' + months[parseInt(parts[1]) - 1] + ' ' + parts[0];
+        }
+
+        html += '<div class="info-panel" style="margin-bottom:var(--s-4);"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:var(--s-2);">' +
+          '<div><div style="font-family:var(--display);font-size:22px;font-weight:700;">' + rName + '</div>' +
+          '<div style="font-family:var(--mono);font-size:10px;color:var(--text-tertiary);margin-top:2px;">' + circuitName + ' \u00b7 ' + dateStr + '</div></div></div></div>';
+
+        if (raceData && raceData.Results) {
+          var isSprint = sprintData && sprintData.SprintResults;
+          html += buildTable('Race', ['Pos', 'Driver', 'Team', 'Grid', 'Laps', 'Time / Status', 'Pts'], raceData.Results, function(res) {
+            var code = res.Driver.code;
+            var team = mapTeam(res.Constructor.name);
+            var c = TEAM_COLORS ? (TEAM_COLORS[team] || '#666') : '#666';
+            var posClass = res.position === '1' ? ' style="color:var(--gold);font-weight:700;"' : (res.position === '2' ? ' style="color:#C0C0C0;font-weight:700;"' : (res.position === '3' ? ' style="color:#CD7F32;font-weight:700;"' : ''));
+            var time = res.Time ? res.Time.time : res.status;
+            var ptsBadge = parseInt(res.points) > 0 ? '<span style="color:var(--teal);font-weight:600;">' + res.points + '</span>' : '<span style="color:var(--text-muted);">' + res.points + '</span>';
+            var gridStr = res.grid === '0' ? 'PIT' : 'P' + res.grid;
+            var gridColor = parseInt(res.grid) === 1 ? ' style="color:var(--gold);"' : (parseInt(res.grid) <= 3 ? ' style="color:var(--text);"' : '');
+            var dot = '<span class="strip-team-dot" style="background:' + c + ';display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle;"></span>';
+            return '<td' + posClass + '>' + res.position + '</td><td>' + dot + code + '</td><td style="color:' + c + ';font-size:10px;">' + team + '</td><td' + gridColor + '>' + gridStr + '</td><td>' + res.laps + '</td><td style="font-size:10px;color:var(--text-tertiary);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + time + '</td><td>' + ptsBadge + '</td>';
+          });
+          html += '<div style="margin-top:var(--s-1);font-family:var(--mono);font-size:8px;color:var(--text-muted);">\u2605 Winner: <strong>' + raceData.Results[0].Driver.code + '</strong> \u00b7 Pole: <strong>' + (qualiData && qualiData.QualifyingResults ? qualiData.QualifyingResults[0].Driver.code : '—') + '</strong></div>';
+        }
+
+        if (qualiData && qualiData.QualifyingResults) {
+          html += '<div style="margin-top:var(--s-5);"></div>';
+          html += buildTable('Qualifying', ['Pos', 'Driver', 'Team', 'Q1', 'Q2', 'Q3'], qualiData.QualifyingResults, function(res, i) {
+            var code = res.Driver.code;
+            var team = mapTeam(res.Constructor.name);
+            var c = TEAM_COLORS ? (TEAM_COLORS[team] || '#666') : '#666';
+            var posClass = res.position === '1' ? ' style="color:var(--gold);font-weight:700;"' : '';
+            var dot = '<span class="strip-team-dot" style="background:' + c + ';display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle;"></span>';
+            var q1 = res.Q1 || '—';
+            var q2 = res.Q2 || '—';
+            var q3 = res.Q3 || '—';
+            return '<td' + posClass + '>' + res.position + '</td><td>' + dot + code + '</td><td style="color:' + c + ';font-size:10px;">' + team + '</td><td style="font-family:var(--mono);font-size:10px;">' + q1 + '</td><td style="font-family:var(--mono);font-size:10px;">' + q2 + '</td><td style="font-family:var(--mono);font-size:10px;font-weight:' + (q3 !== '—' ? '600' : '400') + ';">' + q3 + '</td>';
+          });
+        }
+
+        if (sprintData && sprintData.SprintResults) {
+          html += '<div style="margin-top:var(--s-5);"></div>';
+          html += buildTable('Sprint', ['Pos', 'Driver', 'Team', 'Grid', 'Laps', 'Time / Status', 'Pts'], sprintData.SprintResults, function(res) {
+            var code = res.Driver.code;
+            var team = mapTeam(res.Constructor.name);
+            var c = TEAM_COLORS ? (TEAM_COLORS[team] || '#666') : '#666';
+            var posClass = res.position === '1' ? ' style="color:var(--gold);font-weight:700;"' : (res.position === '2' ? ' style="color:#C0C0C0;font-weight:700;"' : (res.position === '3' ? ' style="color:#CD7F32;font-weight:700;"' : ''));
+            var time = res.Time ? res.Time.time : res.status;
+            var ptsBadge = parseInt(res.points) > 0 ? '<span style="color:var(--teal);font-weight:600;">' + res.points + '</span>' : '<span style="color:var(--text-muted);">' + res.points + '</span>';
+            var dot = '<span class="strip-team-dot" style="background:' + c + ';display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px;vertical-align:middle;"></span>';
+            return '<td' + posClass + '>' + res.position + '</td><td>' + dot + code + '</td><td style="color:' + c + ';font-size:10px;">' + team + '</td><td>P' + res.grid + '</td><td>' + res.laps + '</td><td style="font-size:10px;color:var(--text-tertiary);">' + time + '</td><td>' + ptsBadge + '</td>';
+          });
+        }
+
+        area.innerHTML = html;
+      });
+    }
+
+    function buildTable(title, cols, data, rowFn) {
+      var style = 'width:100%;border-collapse:collapse;font-family:var(--mono);font-size:11px;';
+      var headerStyle = 'padding:8px 10px;text-align:left;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-tertiary);border-bottom:1px solid var(--border);';
+      var html = '<div style="margin-bottom:var(--s-3);"><div style="font-family:var(--display);font-size:16px;font-weight:700;margin-bottom:var(--s-2);">' + title + '</div>';
+      html += '<div style="overflow-x:auto;"><table style="' + style + '"><thead><tr>';
+      for (var i = 0; i < cols.length; i++) {
+        html += '<th style="' + headerStyle + '">' + cols[i] + '</th>';
+      }
+      html += '</tr></thead><tbody>';
+      for (var j = 0; j < data.length; j++) {
+        var bg = j % 2 === 1 ? 'background:rgba(255,255,255,0.02);' : '';
+        var topBorder = j > 0 && data[j - 1] && data[j - 1].positionText === 'R' ? 'border-top:2px solid var(--red-dim);' : '';
+        html += '<tr style="' + bg + topBorder + '">' + rowFn(data[j], j) + '</tr>';
+      }
+      html += '</tbody></table></div></div>';
+      return html;
+    }
+
+    function buildRoundSelector() {
+      var el = document.getElementById('roundSelector');
+      var defaultRd = 1;
+      for (var i = CAL.length - 1; i >= 0; i--) {
+        if (CAL[i].st === 'done') { defaultRd = CAL[i].rd; break; }
+      }
+      if (!defaultRd) defaultRd = 1;
+      var html = '<div style="display:flex;gap:var(--s-2);overflow-x:auto;padding:var(--s-2) 0;margin-bottom:var(--s-5);-webkit-overflow-scrolling:touch;">';
+      for (var j = 0; j < CAL.length; j++) {
+        var r = CAL[j];
+        var active = r.rd === defaultRd ? ' active' : '';
+        var done = r.st === 'done' ? ' done' : '';
+        html += '<button class="rs-btn' + active + done + '" data-rd="' + r.rd + '" onclick="loadRound(' + r.rd + ')">' +
+          '<span style="font-size:12px;line-height:1;">' + r.flag + '</span>' +
+          '<span style="font-size:8px;font-family:var(--mono);color:var(--text-tertiary);">R' + r.rd + '</span>' +
+          '<span style="font-size:9px;white-space:nowrap;">' + r.nm.replace(' GP', '') + '</span>' +
+          '</button>';
+      }
+      html += '</div>';
+      el.innerHTML = html;
+      loadRound(defaultRd);
+    }
+
+    // ═══ INIT ═══
+    updateNavFromCalendar();
+    buildStrip();
+    buildRoundSelector();
+  </script>
+</body>
+</html>
