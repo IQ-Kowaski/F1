@@ -338,45 +338,53 @@
     //  YOUTUBE VIDEO CARDS
     // ═══════════════════════════════════════════════
     async function loadYouTubeVideos() {
-      var feedUrl = 'https://www.youtube.com/feeds/videos.xml?channel_id=UCB_qr75-ydFVKSF9Dmo6izg';
-      var proxies = ['https://api.allorigins.win/raw?url=', 'https://api.allorigins.io/raw?url=', 'https://corsproxy.io/?url='];
-      var xml = null;
-      for (var p = 0; p < proxies.length; p++) {
-        try {
-          var ctrl = new AbortController();
-          var t = setTimeout(function() { ctrl.abort(); }, 6000);
-          var r = await fetch(proxies[p] + encodeURIComponent(feedUrl), { signal: ctrl.signal });
-          clearTimeout(t);
-          if (r.ok) { xml = await r.text(); break; }
-        } catch (_) {}
-      }
-      if (!xml) return;
-
+      var FALLBACK = [
+        { id: 'bnZ7bIFztUw', title: 'Drivers Look Ahead To Barcelona Weekend' },
+        { id: 'hKhR7uZMGks', title: 'Weekend Warm-Up | 2026 Barcelona-Catalunya GP' },
+        { id: 'ln5KUZz2NkA', title: 'Extended Highlights | 2016 Spanish Grand Prix' },
+        { id: 'VARJPpeQd5A', title: 'The 2026 Grid Reacts To Their F1 25 Ratings!' },
+        { id: 'Mqy3wzOmwmA', title: 'Alex Albon: On The Cusp of History With Williams' },
+        { id: 'nU8lw_64WVM', title: 'Chasing The Dream | 2026 Monaco GP | F2 Behind The Scenes' },
+        { id: 'R7BnqufQ1Ns', title: 'Kimi Thanked His Car' },
+        { id: 'atFrP458Q3E', title: 'Carlos Sainz\'s Brutal Monaco Experience' }
+      ];
       var grid = document.getElementById('hlGrid');
       if (!grid) return;
 
-      var entries = xml.split('<entry>');
-      var cards = [];
-      for (var i = 1; i < entries.length && cards.length < 12; i++) {
-        var e = entries[i];
-        var idMatch = e.match(/<yt:videoId>([^<]+)<\/yt:videoId>/) || e.match(/<id>yt:video:([^<]+)<\/id>/);
-        var titleMatch = e.match(/<title[^>]*>([^<]+)<\/title>/);
-        var thumbMatch = e.match(/<media:thumbnail[^>]+url="([^"]+)"/);
-        if (!idMatch || !titleMatch) continue;
-        var vid = idMatch[1];
-        var title = titleMatch[1].replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
-        var thumb = thumbMatch ? thumbMatch[1] : ('https://img.youtube.com/vi/' + vid + '/mqdefault.jpg');
-        var tLower = title.toLowerCase();
-        if (tLower.indexOf('#shorts') >= 0 || tLower.indexOf('shorts') >= 0) continue;
-        cards.push({ id: vid, title: title, thumb: thumb });
+      var cards = FALLBACK.slice();
+
+      var feedUrl = 'https://www.youtube.com/feeds/videos.xml?channel_id=UCB_qr75-ydFVKSF9Dmo6izg';
+      var proxies = ['https://api.allorigins.win/raw?url=', 'https://api.allorigins.io/raw?url='];
+      for (var p = 0; p < proxies.length; p++) {
+        try {
+          var ctrl = new AbortController();
+          var t = setTimeout(function() { ctrl.abort(); }, 5000);
+          var r = await fetch(proxies[p] + encodeURIComponent(feedUrl), { signal: ctrl.signal });
+          clearTimeout(t);
+          if (r.ok) {
+            var xml = await r.text();
+            var entries = xml.split('<entry>');
+            var fresh = [];
+            for (var i = 1; i < entries.length && fresh.length < 12; i++) {
+              var e = entries[i];
+              var idMatch = e.match(/<yt:videoId>([^<]+)<\/yt:videoId>/) || e.match(/<id>yt:video:([^<]+)<\/id>/);
+              var titleMatch = e.match(/<title[^>]*>([^<]+)<\/title>/);
+              if (!idMatch || !titleMatch) continue;
+              var tLower = titleMatch[1].toLowerCase();
+              if (tLower.indexOf('#shorts') >= 0 || tLower.indexOf('shorts') >= 0) continue;
+              fresh.push({ id: idMatch[1], title: titleMatch[1] });
+            }
+            if (fresh.length >= 4) cards = fresh;
+            break;
+          }
+        } catch (_) {}
       }
 
-      if (!cards.length) return;
       grid.innerHTML = cards.map(function(c) {
         var escTitle = c.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
         return '<div class="highlight-card" onclick="window.open(\'https://www.youtube.com/watch?v=' + c.id + '\',\'_blank\')" style="cursor:pointer;">' +
           '<div class="highlight-thumb">' +
-          '<img src="' + c.thumb + '" alt="' + escTitle + '" loading="lazy">' +
+          '<img src="https://img.youtube.com/vi/' + c.id + '/mqdefault.jpg" alt="' + escTitle + '" loading="lazy">' +
           '<div class="highlight-overlay"></div>' +
           '<div class="highlight-play"><div class="play-btn-circle"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor;margin-left:2px;"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>' +
           '</div>' +
