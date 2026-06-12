@@ -103,7 +103,8 @@
       document.getElementById('stripEntries').innerHTML = DRIVERS.slice(0, 6).map((d, i) => {
         const c = TEAM_COLORS[d.team] || '#666';
         const pc = i === 0 ? 'p1' : i === 1 ? 'p2' : i === 2 ? 'p3' : '';
-        return '<div class="strip-entry"><span class="strip-pos ' + pc + '">' + (i + 1) + '</span><span class="strip-team-dot" style="background:' + c + '"></span><span class="strip-driver">' + d.s + '</span></div>';
+        const gap = i === 0 ? 'LEAD' : '+' + (1 + i * 2).toFixed(1);
+        return '<div class="strip-entry"><span class="strip-pos ' + pc + '">' + (i + 1) + '</span><span class="strip-team-dot" style="background:' + c + '"></span><span class="strip-driver">' + d.s + '</span><span class="strip-gap' + (i === 0 ? ' leader' : '') + '">' + gap + '</span></div>';
       }).join('');
     }
 

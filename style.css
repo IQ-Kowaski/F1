@@ -367,6 +367,29 @@ nav {
   flex-shrink: 0;
 }
 
+.strip-gap {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  min-width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.strip-gap.leader {
+  color: var(--teal);
+}
+
+.strip-status {
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 1px 4px;
+  border-radius: var(--r-sm);
+  background: var(--bg-surface);
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
 /* ═══ PAGE CONTENT WRAPPER ═══ */
 .page-wrap {
   padding-top: calc(var(--nav-h) + var(--timing-h));
