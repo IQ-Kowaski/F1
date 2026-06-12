@@ -318,6 +318,117 @@
     // ═══════════════════════════════════════════════
     //  STANDINGS
     // ═══════════════════════════════════════════════
+    const API_BASE = 'https://f1api.dev/api';
+
+    const TEAM_MAP = {
+      'Mercedes Formula 1 Team': 'Mercedes',
+      'Scuderia Ferrari': 'Ferrari',
+      'Red Bull Racing': 'Red Bull',
+      'McLaren Formula 1 Team': 'McLaren',
+      'Alpine F1 Team': 'Alpine',
+      'RB F1 Team': 'Racing Bulls',
+      'Haas F1 Team': 'Haas',
+      'Williams Racing': 'Williams',
+      'Aston Martin F1 Team': 'Aston Martin',
+      'Audi Revolut F1 Team': 'Audi',
+      'Cadillac Formula 1 Team': 'Cadillac'
+    };
+
+    function driverFromShort(s) {
+      return DRIVERS.find(d => d.s === s);
+    }
+
+    async function fetchLiveStandings() {
+      const drvPts = {};
+      const teamPts = {};
+
+      for (let r = 1; r <= 8; r++) {
+        try {
+          const res = await fetch(API_BASE + '/2026/' + r + '/race');
+          if (!res.ok) continue;
+          const data = await res.json();
+          const results = data.races.results;
+          if (!results) continue;
+          results.forEach(d => {
+            const s = d.driver.shortName;
+            const team = TEAM_MAP[d.team.teamName] || d.team.teamName;
+            const pts = d.points || 0;
+            drvPts[s] = (drvPts[s] || 0) + pts;
+            teamPts[team] = (teamPts[team] || 0) + pts;
+          });
+        } catch(e) {
+          continue;
+        }
+      }
+
+      const drvKeys = Object.keys(drvPts);
+      if (drvKeys.length === 0) throw new Error('No data');
+
+      const sortedDrivers = drvKeys
+        .map(s => {
+          const d = driverFromShort(s);
+          return d ? { ...d, pts: drvPts[s] } : null;
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.pts - a.pts);
+
+      const sortedTeams = Object.keys(teamPts)
+        .map(n => {
+          const t = CONS.find(c => c.name === n);
+          if (t) return { ...t, pts: teamPts[n] };
+          const newTeam = { name: n, pts: teamPts[n], c: '#666' };
+          DRIVERS.forEach(d => {
+            if (d.team === n && TEAM_COLORS[n]) newTeam.c = TEAM_COLORS[n];
+          });
+          return newTeam;
+        })
+        .sort((a, b) => b.pts - a.pts);
+
+      document.getElementById('drvTbl').innerHTML = renderDriverRows(sortedDrivers.slice(0, 10));
+      document.getElementById('conTbl').innerHTML = renderConstructorRows(sortedTeams);
+    }
+
+    function renderDriverRows(list) {
+      const mx = list[0].pts;
+      return list.map((d, i) => {
+        const pc = i === 0 ? 'p1' : i === 1 ? 'p2' : i === 2 ? 'p3' : 'px';
+        const c = TEAM_COLORS[d.team] || '#666';
+        const primary = DRIVER_PHOTOS[d.s];
+        const fallback = DRIVER_FALLBACK[d.s];
+        let img = '';
+        if (primary) {
+          const fe = fallback ? `onerror="this.src='${fallback}';this.onerror=function(){this.style.display='none';this.nextElementSibling.style.display='flex';}"` : `onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"`;
+          img = `<img src="${primary}" alt="${d.s}" style="width:100%;height:100%;object-fit:cover;object-position:top;" ${fe}>`;
+        } else if (fallback) {
+          img = `<img src="${fallback}" alt="${d.s}" style="width:100%;height:100%;object-fit:cover;object-position:top;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">`;
+        }
+        return `<div class="standings-row" onclick="location.href='drivers.html#${d.s}'">
+          <div class="st-pos ${pc}">${i + 1}</div>
+          <div class="st-avatar" style="border:1.5px solid ${c}44;background:${c}11;">
+            ${img}
+            <span style="font-family:var(--mono);font-size:7px;color:${c};display:${img ? 'none' : 'flex'}">${d.s}</span>
+          </div>
+          <div style="flex:1;min-width:0"><div class="st-name">${d.name}</div><div class="st-team" style="color:${c}">${d.team}</div></div>
+          <div class="st-bar-wrap"><div class="st-bar-fill" style="width:${mx > 0 ? (d.pts / mx * 100).toFixed(1) : 0}%;background:${c}"></div></div>
+          <div class="st-pts" style="color:${c}">${d.pts}<span class="st-pts-label">pts</span></div>
+        </div>`;
+      }).join('');
+    }
+
+    function renderConstructorRows(list) {
+      const mx = list[0].pts;
+      return list.map((t, i) => {
+        const pc = i === 0 ? 'p1' : i === 1 ? 'p2' : i === 2 ? 'p3' : 'px';
+        return `<div class="standings-row">
+          <div class="st-pos ${pc}">${i + 1}</div>
+          <div class="st-team-dot" style="background:${t.c};"></div>
+          <div style="flex:1"><div class="st-name">${t.name}</div></div>
+          <div class="st-bar-wrap"><div class="st-bar-fill" style="width:${t.pts > 0 ? (t.pts / mx * 100).toFixed(1) : 0}%;background:${t.c}"></div></div>
+          <div class="st-pts" style="color:${t.c}">${t.pts}<span class="st-pts-label">pts</span></div>
+        </div>`;
+      }).join('');
+    }
+
     function buildDrivers() {
       const mx = DRIVERS[0].pts;
       const top = DRIVERS.slice(0, 10);
@@ -578,10 +689,9 @@
     // ═══════════════════════════════════════════════
     buildTimingStrip();
     buildSchedule();
-    buildDrivers();
-    buildCons();
     renderHL(HIGHLIGHTS);
     loadStreams();
+    fetchLiveStandings().catch(function() { buildDrivers(); buildCons(); });
   </script>
 </body>
 </html>
