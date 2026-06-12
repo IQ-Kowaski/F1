@@ -318,8 +318,6 @@ nav {
   gap: 0;
   flex: 1;
   overflow: hidden;
-  mask-image: linear-gradient(to right, black 80%, transparent 98%);
-  -webkit-mask-image: linear-gradient(to right, black 80%, transparent 98%);
 }
 
 .strip-entry {
