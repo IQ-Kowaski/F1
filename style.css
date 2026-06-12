@@ -2487,25 +2487,38 @@ footer {
 @media (max-width: 900px) {
   .stream-wrap { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
   .stream-sidebar { max-height: 260px; }
+  nav { gap: 0; padding: 0 var(--s-3); }
+  .nav-links {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    margin-left: 0;
+    flex: 1;
+  }
+  .nav-links::-webkit-scrollbar { display: none; }
   .nav-links a {
-    padding: 12px 10px;
-    min-width: 44px;
-    text-align: center;
-    font-size: 0;
-    line-height: 0;
+    white-space: nowrap;
+    padding: 6px 8px;
+    font-size: 10px;
+    min-width: auto;
   }
-  .nav-links a::first-letter {
-    font-size: 12px;
-    line-height: 1;
-  }
+  .nav-logo-text { font-size: 13px; letter-spacing: 1px; }
+  .nav-logo svg { height: 20px; }
+  .nav-round { display: none; }
+  .live-pill { padding: 3px 8px; gap: 4px; }
+  .live-pill span:last-child { font-size: 8px; }
+  .section { padding: var(--s-8) var(--s-4); }
 }
 
 @media (max-width: 680px) {
   :root {
-    --s-6: 16px;
-    --s-8: 24px;
-    --s-12: 36px;
-    --s-16: 48px;
+    --s-4: 12px;
+    --s-6: 14px;
+    --s-8: 20px;
+    --s-10: 28px;
+    --s-12: 28px;
+    --s-16: 36px;
+    --s-20: 48px;
   }
 
   .hero-round { display: none; }
@@ -2515,22 +2528,78 @@ footer {
 
   .info-panels { grid-template-columns: 1fr; }
   .calendar-grid { grid-template-columns: 1fr; }
-  .driver-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-  .tracks-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
-  .teams-grid { grid-template-columns: 1fr; }
+  .driver-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--s-2); }
+  .tracks-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: var(--s-2); }
+  .teams-grid { gap: var(--s-2); }
 
   .detail-left { padding: var(--s-6) var(--s-4); }
   .detail-right { padding: var(--s-4); }
   .detail-stats { flex-direction: column; gap: var(--s-2); }
+  .detail-pane { padding: var(--s-4); }
+  .detail-grid { min-height: auto; }
+  .detail-photo-wrap { width: 100px; height: 100px; }
+  .detail-name { font-size: 20px; }
 
-  .stream-tab { padding: 10px 6px; }
+  .hero { min-height: auto; }
+  .hero-inner { padding: var(--s-10) var(--s-4); }
+  .hero-title { font-size: 26px; }
+  .hero-eyebrow { font-size: 10px; }
+  .hero-circuit { font-size: 11px; }
+  .hero-meta { gap: var(--s-2); }
+  .hero-ctas { flex-direction: column; }
+  .hero-ctas .btn { padding: 14px 24px; min-height: 48px; justify-content: center; }
+
+  .section { padding: var(--s-8) var(--s-4); }
+  .section-title { font-size: 20px; }
+  .section-header { flex-wrap: wrap; gap: var(--s-2); margin-bottom: var(--s-4); }
+  .section-sub { margin-left: 0; width: 100%; }
+
+  .standings-grid { gap: var(--s-3); }
+
+  .stream-tab { padding: 10px 6px; font-size: 8px; }
+  .stream-sidebar { min-height: 300px; max-height: 300px; }
   .modal-close { width: 44px; height: 44px; }
   .back-btn { padding: 12px 16px; min-height: 44px; }
   .stream-src-btn { padding: 10px 14px; min-height: 44px; }
   .stream-alt-link { padding: 12px 14px; }
-  .detail-tab { padding: 12px 14px; }
-  .nav-links a { padding: 14px 10px; min-width: 48px; }
-  .hero-ctas .btn { padding: 14px 24px; min-height: 48px; }
+  .detail-tab { padding: 12px 14px; font-size: 9px; letter-spacing: 0.5px; }
+
+  nav { padding: 0 var(--s-2); gap: 2px; }
+  .nav-logo-text { font-size: 11px; letter-spacing: 1px; }
+  .nav-logo svg { height: 18px; }
+  .nav-links a { padding: 8px 6px; font-size: 9px; }
+  .live-pill { padding: 2px 6px; }
+  .live-pill span:last-child { font-size: 7px; }
+  .live-dot { width: 4px; height: 4px; }
+
+  .track-card { min-height: auto; }
+  .track-img-wrap { height: 80px; }
+  .team-card-top { padding: var(--s-3); }
+  .team-drivers { flex-direction: column; gap: var(--s-1); }
+
+  .race-card { padding: var(--s-3); }
+  .race-name { font-size: 12px; }
+  .race-flag { font-size: 18px; }
+
+  .driver-card-body { padding: var(--s-3); }
+  .driver-photo-wrap { width: 48px; height: 48px; }
+  .driver-name { font-size: 13px; }
+  .driver-number { font-size: 28px; }
+
+  .highlights-grid { grid-template-columns: 1fr; }
+  .telem-grid { grid-template-columns: repeat(2, 1fr); gap: var(--s-2); }
+  .telem-card { padding: var(--s-3); }
+  .telem-value { font-size: 22px; }
+  .telem-icon { width: 32px; height: 32px; }
+
+  .standings-row { padding: 6px 10px; }
+  .st-name { font-size: 11px; }
+  .st-pts { font-size: 11px; }
+  .st-avatar { width: 20px; height: 20px; }
+  .st-bar-wrap { width: 32px; }
+
+  footer { flex-direction: column; text-align: center; gap: var(--s-2); padding: var(--s-4); }
+  .footer-links { justify-content: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
