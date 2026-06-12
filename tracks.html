@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tracks · F1 2026 — APEX</title>
+  <link rel="icon" type="image/x-icon" href="f1-logo.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav>
+    <a href="index.html" class="nav-logo"><img src="f1-logo.svg" alt="F1" style="height:24px;width:auto;"><span class="nav-logo-text"><em>APEX</em></span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Live</a></li>
+      <li><a href="standings.html">Standings</a></li>
+      <li><a href="drivers.html">Drivers</a></li>
+      <li><a href="calendar.html">Calendar</a></li>
+      <li><a href="tracks.html" class="active">Tracks</a></li>
+      <li><a href="teams.html">Teams</a></li>
+    </ul>
+    <div class="nav-right"><span class="nav-round">22 Circuits</span><div class="live-pill"><span class="live-dot"></span><span>Worldwide</span></div></div>
+  </nav>
+  <div class="timing-strip"><div class="timing-strip-inner"><span class="strip-label" aria-hidden="true">Circuits</span><div class="strip-entries" id="stripEntries" aria-live="polite" aria-label="Circuits list"></div></div></div>
+  <div class="page-wrap" id="main-content">
+    <section class="section">
+      <div class="section-header"><span class="section-eyebrow">CIRCUITS</span><h1 class="section-title">Iconic Tracks</h1><span class="section-sub">22 Circuits</span></div>
+      <div class="tracks-grid" id="tracksGrid"></div>
+    </section>
+    <footer>
+      <div class="footer-logo"><img src="f1-logo.svg" style="height:18px;display:inline-block;vertical-align:middle;margin-right:6px;"><em>APEX</em></div>
+      <div class="footer-links"><a href="https://www.formula1.com" target="_blank" rel="noopener">Official F1</a><a href="https://www.youtube.com/@F1" target="_blank" rel="noopener">F1 YouTube</a><a href="https://www.f1tv.formula1.com" target="_blank" rel="noopener">F1 TV</a></div>
+      <div class="footer-note">Data: 2026 F1 World Championship</div>
+    </footer>
+  </div>
+  <script src="data.js"></script>
+  <script>
+    function buildStrip() {
+      document.getElementById('stripEntries').innerHTML = DRIVERS.slice(0,6).map((d,i) => {
+        const c = TEAM_COLORS[d.team]||'#666';
+        return '<div class="strip-entry"><span class="strip-pos '+(i===0?'p1':i===1?'p2':i===2?'p3':'')+'">'+(i+1)+'</span><span class="strip-team-dot" style="background:'+c+'"></span><span class="strip-driver">'+d.s+'</span></div>';
+      }).join('');
+    }
+    function buildTracks() {
+      const typeColors = { 'Street': 'var(--gold)', 'Permanent': 'var(--teal)' };
+      const typeBgs = { 'Street': 'rgba(255,215,0,0.1)', 'Permanent': 'var(--teal-dim)' };
+      const typeBorders = { 'Street': 'rgba(255,215,0,0.25)', 'Permanent': 'rgba(0,210,190,0.2)' };
+      document.getElementById('tracksGrid').innerHTML = TRACKS.map(t =>
+        '<div class="track-card">' +
+        '<div class="track-img-wrap">' +
+        '<span class="track-country">'+t.country+'</span>' +
+        '<span class="track-type-badge"><span class="badge" style="font-size:7px;padding:2px 5px;background:'+(typeBgs[t.type]||'var(--bg-surface)')+';color:'+(typeColors[t.type]||'var(--text-tertiary)')+';border-color:'+(typeBorders[t.type]||'var(--border)')+';">'+t.type+'</span></span>' +
+        '<img class="track-img" src="'+t.img+'" alt="'+t.name+'" loading="lazy" onerror="this.style.opacity=\'0.05\'">' +
+        '</div>' +
+        '<div class="track-info">' +
+        '<div class="track-name">'+t.name+'</div>' +
+        '<div class="track-city">'+t.city+'</div>' +
+        '<div class="track-stats">' +
+        '<div class="track-stat"><div class="track-stat-value">'+t.laps+'</div><div class="track-stat-label">Laps</div></div>' +
+        '<div class="track-stat"><div class="track-stat-value">'+t.len+'</div><div class="track-stat-label">Length</div></div>' +
+        '<div class="track-stat"><div class="track-stat-value">'+t.turns+'</div><div class="track-stat-label">Turns</div></div>' +
+        '<div class="track-stat"><div class="track-stat-value" style="font-size:8px">'+t.lap+'</div><div class="track-stat-label">Record</div></div>' +
+        '</div></div></div>'
+      ).join('');
+    }
+    buildStrip();
+    buildTracks();
+  </script>
+</body>
+</html>

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>APEX · F1 2026</title>
+  <link rel="icon" type="image/x-icon" href="f1-logo.svg">
+  <meta name="description" content="Live F1 streams, real-time standings, driver profiles, race calendar, circuits, and team data for the 2026 Formula 1 World Championship.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- ═══ NAV ═══ -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="f1-logo.svg" alt="F1" style="height:24px;width:auto;">
+      <span class="nav-logo-text"><em>APEX</em></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Live</a></li>
+      <li><a href="standings.html">Standings</a></li>
+      <li><a href="drivers.html">Drivers</a></li>
+      <li><a href="calendar.html">Calendar</a></li>
+      <li><a href="tracks.html">Tracks</a></li>
+      <li><a href="teams.html">Teams</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-round" id="navRound">Rd 7 · Spain</span>
+      <div class="live-pill">
+        <span class="live-dot"></span>
+        <span id="liveTxt">Live</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ═══ TIMING STRIP (signature element) ═══ -->
+  <div class="timing-strip">
+    <div class="timing-strip-inner">
+      <span class="strip-label" aria-hidden="true">Positions</span>
+      <div class="strip-entries" id="stripEntries" role="marquee" aria-live="polite" aria-label="Live timing positions"></div>
+    </div>
+  </div>
+
+  <!-- ═══ PAGE WRAPPER ═══ -->
+  <div class="page-wrap" id="main-content">
+
+    <!-- HERO -->
+    <section class="hero" id="home">
+      <div class="hero-inner">
+        <div class="hero-eyebrow">This Weekend</div>
+        <h1 class="hero-title">Spanish Grand <em>Prix</em></h1>
+        <div class="hero-meta">
+          <span class="hero-circuit">Circuit de Barcelona-Catalunya</span>
+          <span class="hero-dates">Jun 12–14</span>
+          <span class="hero-status live">This Weekend</span>
+        </div>
+        <div class="hero-ctas">
+          <a href="#streams" class="btn btn-primary">Watch Live</a>
+          <a href="standings.html" class="btn btn-secondary">Championship</a>
+        </div>
+        <div class="hero-round">R7</div>
+      </div>
+    </section>
+
+    <!-- LIVE STREAMS -->
+    <section class="section fade-in" id="streams">
+      <div class="section-header">
+        <span class="section-eyebrow">LIVE</span>
+        <h2 class="section-title">Streams</h2>
+        <span class="section-sub" id="streamStatus">Loading sessions…</span>
+      </div>
+      <div class="stream-wrap">
+        <div class="stream-sidebar">
+          <div class="stream-sb-header">
+            <span>F1 Sessions</span>
+            <span class="stream-sb-count" id="mCnt">—</span>
+          </div>
+          <div class="stream-tabs" role="tablist" aria-label="Session filters">
+            <div class="stream-tab active" role="tab" aria-selected="true" tabindex="0" onclick="filterSessions('all',this)" onkeydown="if(event.key==='Enter')filterSessions('all',this)">All</div>
+            <div class="stream-tab" role="tab" aria-selected="false" tabindex="-1" onclick="filterSessions('practice',this)" onkeydown="if(event.key==='Enter')filterSessions('practice',this)">Practice</div>
+            <div class="stream-tab" role="tab" aria-selected="false" tabindex="-1" onclick="filterSessions('qual',this)" onkeydown="if(event.key==='Enter')filterSessions('qual',this)">Quali</div>
+            <div class="stream-tab" role="tab" aria-selected="false" tabindex="-1" onclick="filterSessions('race',this)" onkeydown="if(event.key==='Enter')filterSessions('race',this)">Race</div>
+          </div>
+          <div class="stream-scroll" id="mScroll">
+            <div class="loading">
+              <div class="spinner"></div>Loading sessions…
+            </div>
+          </div>
+        </div>
+        <div class="stream-player">
+          <div class="stream-video">
+            <div class="stream-placeholder" id="pPH">
+              <div class="stream-placeholder-icon">F1</div>
+              <div class="stream-placeholder-title">Select a Session</div>
+              <div class="stream-placeholder-sub">Choose any F1 session from the sidebar</div>
+            </div>
+            <div class="stream-error" id="streamErr">
+              <div class="stream-err-title">Unavailable</div>
+              <div class="stream-err-sub">This session may not be live yet.</div>
+              <div class="stream-alt-links">
+                <a class="stream-alt-link" href="https://www.formula1.com/en/live.html" target="_blank" rel="noopener">F1.com official live</a>
+                <a class="stream-alt-link" href="https://www.youtube.com/@F1" target="_blank" rel="noopener">F1 YouTube channel</a>
+                <a class="stream-alt-link" href="https://www.f1tv.formula1.com" target="_blank" rel="noopener">F1 TV Pro</a>
+              </div>
+            </div>
+            <iframe id="f1iframe" allowfullscreen allow="autoplay;fullscreen;picture-in-picture;encrypted-media" referrerpolicy="no-referrer-when-downgrade"></iframe>
+          </div>
+          <div class="stream-controls" id="pCtrl" style="display:none;">
+            <div class="stream-match-name" id="pNm">—</div>
+            <div class="stream-session-type" id="pSessionType"></div>
+            <div class="stream-source-btns" id="sBtns"></div>
+            <div class="stream-note">If video doesn't load, try another source or use the official links above.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WEEKEND SCHEDULE -->
+    <section class="section fade-in">
+      <div class="section-header">
+        <span class="section-eyebrow">SCHEDULE</span>
+        <h2 class="section-title">Barcelona Weekend</h2>
+        <span class="section-sub">All times local</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:var(--s-3);" id="schedGrid">
+        <!-- rendered by JS -->
+      </div>
+    </section>
+
+    <!-- STANDINGS PREVIEW -->
+    <section class="section fade-in" id="standings">
+      <div class="section-header">
+        <span class="section-eyebrow">STANDINGS</span>
+        <h2 class="section-title">Championship</h2>
+        <span class="section-sub">After Rd 6 — Monaco</span>
+      </div>
+      <div class="standings-grid">
+        <div class="standings-wrap">
+          <div class="standings-header">
+            <span class="standings-header-title">Drivers</span>
+            <span class="badge badge-muted">Top 10</span>
+          </div>
+          <div id="drvTbl"></div>
+        </div>
+        <div class="standings-wrap">
+          <div class="standings-header">
+            <span class="standings-header-title">Constructors</span>
+            <span class="badge badge-muted">11 Teams</span>
+          </div>
+          <div id="conTbl"></div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:var(--s-4)">
+        <a href="standings.html" class="btn btn-secondary" style="font-size:12px;">Full Standings</a>
+      </div>
+    </section>
+
+    <!-- HIGHLIGHTS -->
+    <section class="section fade-in" id="highlights">
+      <div class="section-header">
+        <span class="section-eyebrow">MEDIA</span>
+        <h2 class="section-title">Highlights</h2>
+        <span class="section-sub">2026 &amp; Classics</span>
+      </div>
+      <div style="display:flex;gap:2px;margin-bottom:var(--s-4);border:1px solid var(--border);border-radius:var(--r-sm);overflow:hidden;max-width:480px;" role="tablist" aria-label="Highlight filters">
+        <div class="stream-tab active" role="tab" aria-selected="true" tabindex="0" onclick="filterHL('all',this)" onkeydown="if(event.key==='Enter')filterHL('all',this)" style="padding:6px 14px;font-size:10px;">All</div>
+        <div class="stream-tab" role="tab" aria-selected="false" tabindex="-1" onclick="filterHL('highlights',this)" onkeydown="if(event.key==='Enter')filterHL('highlights',this)" style="padding:6px 14px;font-size:10px;">Highlights</div>
+        <div class="stream-tab" role="tab" aria-selected="false" tabindex="-1" onclick="filterHL('replays',this)" onkeydown="if(event.key==='Enter')filterHL('replays',this)" style="padding:6px 14px;font-size:10px;">Replays</div>
+        <div class="stream-tab" role="tab" aria-selected="false" tabindex="-1" onclick="filterHL('onboards',this)" onkeydown="if(event.key==='Enter')filterHL('onboards',this)" style="padding:6px 14px;font-size:10px;">Onboards</div>
+      </div>
+      <div class="highlights-grid" id="hlGrid"></div>
+    </section>
+
+    <!-- TELEMETRY -->
+    <section class="section fade-in" id="telemetry">
+      <div class="section-header">
+        <span class="section-eyebrow">DATA</span>
+        <h2 class="section-title">F1 Telemetry</h2>
+        <span class="section-sub">2026 Hybrid Era</span>
+      </div>
+      <div class="telem-grid">
+        <div class="telem-card">
+          <div class="telem-card-bar" style="background:var(--red);"></div>
+          <div class="telem-icon">V</div>
+          <div class="telem-value" style="color:var(--red);">352</div>
+          <div class="telem-unit">km/h — Top Speed</div>
+          <div class="telem-label">Max straight-line speed</div>
+          <div class="telem-progress"><div class="telem-progress-fill" style="width:100%;background:var(--red);"></div></div>
+        </div>
+        <div class="telem-card">
+          <div class="telem-card-bar" style="background:var(--gold);"></div>
+          <div class="telem-icon">HP</div>
+          <div class="telem-value" style="color:var(--gold);">1,000</div>
+          <div class="telem-unit">HP — Power Output</div>
+          <div class="telem-label">ICE + MGU-H + MGU-K</div>
+          <div class="telem-progress"><div class="telem-progress-fill" style="width:95%;background:var(--gold);"></div></div>
+        </div>
+        <div class="telem-card">
+          <div class="telem-card-bar" style="background:var(--teal);"></div>
+          <div class="telem-icon">ERS</div>
+          <div class="telem-value" style="color:var(--teal);">50%</div>
+          <div class="telem-unit">Electric Power Ratio</div>
+          <div class="telem-label">2026 equal ICE/ERS rule</div>
+          <div class="telem-progress"><div class="telem-progress-fill" style="width:50%;background:var(--teal);"></div></div>
+        </div>
+        <div class="telem-card">
+          <div class="telem-card-bar" style="background:var(--silver);"></div>
+          <div class="telem-icon">0-100</div>
+          <div class="telem-value" style="color:var(--silver);">2.4</div>
+          <div class="telem-unit">sec — 0 to 100 km/h</div>
+          <div class="telem-label">Acceleration benchmark</div>
+          <div class="telem-progress"><div class="telem-progress-fill" style="width:30%;background:var(--silver);"></div></div>
+        </div>
+        <div class="telem-card">
+          <div class="telem-card-bar" style="background:var(--teal);"></div>
+          <div class="telem-icon">PIT</div>
+          <div class="telem-value" style="color:var(--bronze);">2.3</div>
+          <div class="telem-unit">sec — Pit Stop Record</div>
+          <div class="telem-label">Fastest 2026 pit stop</div>
+          <div class="telem-progress"><div class="telem-progress-fill" style="width:40%;background:var(--bronze);"></div></div>
+        </div>
+        <div class="telem-card">
+          <div class="telem-card-bar" style="background:var(--gold);"></div>
+          <div class="telem-icon">G</div>
+          <div class="telem-value" style="color:var(--gold);">5–6G</div>
+          <div class="telem-unit">Cornering G-Force</div>
+          <div class="telem-label">Lateral load on drivers</div>
+          <div class="telem-progress"><div class="telem-progress-fill" style="width:75%;background:var(--gold);"></div></div>
+        </div>
+        <div class="telem-card">
+          <div class="telem-card-bar" style="background:var(--silver);"></div>
+          <div class="telem-icon">°C</div>
+          <div class="telem-value" style="color:var(--silver);">110°</div>
+          <div class="telem-unit">Tyre Temperature</div>
+          <div class="telem-label">Optimal operating range</div>
+          <div class="telem-progress"><div class="telem-progress-fill" style="width:82%;background:var(--silver);"></div></div>
+        </div>
+        <div class="telem-card">
+          <div class="telem-card-bar" style="background:var(--teal);"></div>
+          <div class="telem-icon">DF</div>
+          <div class="telem-value" style="color:var(--teal);">800</div>
+          <div class="telem-unit">kg — Downforce</div>
+          <div class="telem-label">At 200 km/h</div>
+          <div class="telem-progress"><div class="telem-progress-fill" style="width:88%;background:var(--teal);"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-logo"><img src="f1-logo.svg" alt="F1" style="height:18px;display:inline-block;vertical-align:middle;margin-right:6px;"><em>APEX</em></div>
+      <div class="footer-links">
+        <a href="https://www.formula1.com" target="_blank" rel="noopener">Official F1</a>
+        <a href="https://www.youtube.com/@F1" target="_blank" rel="noopener">F1 YouTube</a>
+        <a href="https://www.f1tv.formula1.com" target="_blank" rel="noopener">F1 TV</a>
+      </div>
+      <div class="footer-note">Data: 2026 F1 World Championship</div>
+    </footer>
+  </div>
+
+  <!-- VIDEO MODAL -->
+  <div class="modal-overlay" id="vModal" onclick="mClose(event)">
+    <div class="modal-box" style="max-width:800px;aspect-ratio:16/9;display:flex;flex-direction:column;">
+      <div class="modal-header">
+        <span class="modal-title" id="mTtl">Highlight</span>
+        <button class="modal-close" onclick="closeVid()" aria-label="Close"><svg class="icon" width="14" height="14" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <div class="modal-video" style="flex:1;background:#000;overflow:hidden;position:relative;">
+        <video id="mVideo" controls autoplay muted style="width:100%;height:100%;object-fit:contain;"></video>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script>
+    // ═══════════════════════════════════════════════
+    //  TIMING STRIP — signature element
+    // ═══════════════════════════════════════════════
+    function buildTimingStrip() {
+      const el = document.getElementById('stripEntries');
+      const gaps = ['LEAD', '+3.2', '+5.8', '+8.1', '+10.4', '+12.9', '+14.2', '+16.7', '+18.3', '+20.1'];
+      const statuses = ['', '', '', '', '', 'PIT', '', '', '', 'OUT'];
+      el.innerHTML = DRIVERS.slice(0, 10).map((d, i) => {
+        const c = TEAM_COLORS[d.team] || '#666';
+        const posClass = i === 0 ? 'p1' : i === 1 ? 'p2' : i === 2 ? 'p3' : '';
+        return `<div class="strip-entry">
+          <span class="strip-pos ${posClass}">${i + 1}</span>
+          <span class="strip-team-dot" style="background:${c}"></span>
+          <span class="strip-driver">${d.s}</span>
+          <span class="strip-gap ${i === 0 ? 'leader' : ''}">${i === 0 ? 'LEAD' : gaps[i]}</span>
+          ${statuses[i] ? `<span class="strip-status">${statuses[i]}</span>` : ''}
+        </div>`;
+      }).join('');
+    }
+
+    // ═══════════════════════════════════════════════
+    //  SCHEDULE
+    // ═══════════════════════════════════════════════
+    function buildSchedule() {
+      const sessions = [
+        { label: 'FP1', time: 'Thu 10:30', type: 'Practice' },
+        { label: 'FP2', time: 'Thu 14:00', type: 'Practice' },
+        { label: 'FP3', time: 'Sat 10:30', type: 'Practice' },
+        { label: 'Qualifying', time: 'Sat 14:00', type: 'Qualifying' },
+        { label: 'Race', time: 'Sun 13:00', type: 'Race', highlight: true },
+      ];
+      document.getElementById('schedGrid').innerHTML = sessions.map(s => `
+        <div style="border:1px solid var(--border);border-radius:var(--r);padding:var(--s-4);background:var(--bg-elevated);${s.highlight ? 'border-color:var(--red-dim);background:var(--red-dim);' : ''}">
+          <div style="font-family:var(--mono);font-size:9px;color:${s.highlight ? 'var(--red)' : 'var(--text-tertiary)'};letter-spacing:1.5px;text-transform:uppercase;">${s.label}</div>
+          <div style="font-family:var(--display);font-size:24px;font-weight:700;margin:var(--s-1) 0;${s.highlight ? 'color:var(--red);' : ''}">${s.time}</div>
+          <div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">${s.type}</div>
+        </div>
+      `).join('');
+    }
+
+    // ═══════════════════════════════════════════════
+    //  STANDINGS
+    // ═══════════════════════════════════════════════
+    function buildDrivers() {
+      const mx = DRIVERS[0].pts;
+      const top = DRIVERS.slice(0, 10);
+      document.getElementById('drvTbl').innerHTML = top.map(d => {
+        const pc = d.pos === 1 ? 'p1' : d.pos === 2 ? 'p2' : d.pos === 3 ? 'p3' : 'px';
+        const c = TEAM_COLORS[d.team] || '#666';
+        const primary = DRIVER_PHOTOS[d.s];
+        const fallback = DRIVER_FALLBACK[d.s];
+        let img = '';
+        if (primary) {
+          const fe = fallback ? `onerror="this.src='${fallback}';this.onerror=function(){this.style.display='none';this.nextElementSibling.style.display='flex';}"` : `onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"`;
+          img = `<img src="${primary}" alt="${d.s}" style="width:100%;height:100%;object-fit:cover;object-position:top;" ${fe}>`;
+        } else if (fallback) {
+          img = `<img src="${fallback}" alt="${d.s}" style="width:100%;height:100%;object-fit:cover;object-position:top;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">`;
+        }
+        return `<div class="standings-row" onclick="location.href='drivers.html#${d.s}'">
+          <div class="st-pos ${pc}">${d.pos}</div>
+          <div class="st-avatar" style="border:1.5px solid ${c}44;background:${c}11;">
+            ${img}
+            <span style="font-family:var(--mono);font-size:7px;color:${c};display:${img ? 'none' : 'flex'}">${d.s}</span>
+          </div>
+          <div style="flex:1;min-width:0"><div class="st-name">${d.name}</div><div class="st-team" style="color:${c}">${d.team}</div></div>
+          <div class="st-bar-wrap"><div class="st-bar-fill" style="width:${mx > 0 ? (d.pts / mx * 100).toFixed(1) : 0}%;background:${c}"></div></div>
+          <div class="st-pts" style="color:${c}">${d.pts}<span class="st-pts-label">pts</span></div>
+        </div>`;
+      }).join('');
+    }
+
+    function buildCons() {
+      const mx = CONS[0].pts;
+      document.getElementById('conTbl').innerHTML = CONS.map(c => {
+        const pc = c.pos === 1 ? 'p1' : c.pos === 2 ? 'p2' : c.pos === 3 ? 'p3' : 'px';
+        return `<div class="standings-row">
+          <div class="st-pos ${pc}">${c.pos}</div>
+          <div class="st-team-dot" style="background:${c.c};"></div>
+          <div style="flex:1"><div class="st-name">${c.name}</div></div>
+          <div class="st-bar-wrap"><div class="st-bar-fill" style="width:${c.pts > 0 ? (c.pts / mx * 100).toFixed(1) : 0}%;background:${c.c}"></div></div>
+          <div class="st-pts" style="color:${c.c}">${c.pts}<span class="st-pts-label">pts</span></div>
+        </div>`;
+      }).join('');
+    }
+
+    // ═══════════════════════════════════════════════
+    //  HIGHLIGHTS
+    // ═══════════════════════════════════════════════
+    function renderHL(list) {
+      document.getElementById('hlGrid').innerHTML = list.map(h => `
+        <div class="highlight-card" onclick="openVid('${h.id}','${h.title.replace(/'/g, "\\'")}')">
+          <div class="highlight-thumb">
+            <img src="https://img.youtube.com/vi/${h.id}/maxresdefault.jpg" alt="${h.title}" loading="lazy" onerror="this.src='https://img.youtube.com/vi/${h.id}/mqdefault.jpg'">
+            <div class="highlight-overlay"></div>
+            <div class="highlight-play"><div class="play-btn-circle"><svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:currentColor;margin-left:2px;"><polygon points="5 3 19 12 5 21 5 3"/></svg></div></div>
+            <div class="highlight-duration">${h.dur || ''}</div>
+          </div>
+          <div class="highlight-info">
+            <div class="highlight-tag">${h.tag}</div>
+            <div class="highlight-title">${h.title}</div>
+            <div class="highlight-meta">${h.race}</div>
+          </div>
+        </div>`).join('');
+    }
+
+    function filterHL(cat, el) {
+      el.parentNode.querySelectorAll('.stream-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+        t.tabIndex = -1;
+      });
+      el.classList.add('active');
+      el.setAttribute('aria-selected', 'true');
+      el.tabIndex = 0;
+      renderHL(cat === 'all' ? HIGHLIGHTS : HIGHLIGHTS.filter(h => h.cat === cat));
+    }
+
+    // ═══════════════════════════════════════════════
+    //  VIDEO PLAYER
+    // ═══════════════════════════════════════════════
+    const SAMPLE_VIDEOS = [
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4'
+    ];
+
+    function openVid(vid, title) {
+      let hash = 0;
+      for (let i = 0; i < vid.length; i++) hash = vid.charCodeAt(i) + ((hash << 5) - hash);
+      const url = SAMPLE_VIDEOS[Math.abs(hash) % SAMPLE_VIDEOS.length];
+      document.getElementById('mTtl').textContent = title;
+      const video = document.getElementById('mVideo');
+      if (video) { video.src = url; video.load(); video.play().catch(() => {}); }
+      document.getElementById('vModal').classList.add('open');
+    }
+
+    function closeVid() {
+      document.getElementById('vModal').classList.remove('open');
+      const v = document.getElementById('mVideo');
+      if (v) { v.pause(); v.src = ''; }
+    }
+
+    function mClose(e) {
+      if (e.target === document.getElementById('vModal')) closeVid();
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeVid(); });
+
+    // ═══════════════════════════════════════════════
+    //  LIVE STREAMS
+    // ═══════════════════════════════════════════════
+    const STREAM_API = 'https://streamed.pk/api';
+    let activeRow = null;
+    let allMatches = [];
+
+    function isF1Match(m) {
+      const t = (m.title || '').toLowerCase();
+      const id = (m.id || '').toLowerCase();
+      if (t.includes('nascar') || id.includes('nascar')) return false;
+      if (t.includes('wrc') || t.includes('rally') || id.includes('rally')) return false;
+      if (t.includes('moto2') || t.includes('moto3') || t.includes('motogp') || id.includes('moto')) return false;
+      if (t.includes('indycar') || id.includes('indycar')) return false;
+      if (t.includes('ferrari challenge') || id.includes('ferrari-challenge')) return false;
+      if (t.includes('supercars') || id.includes('supercars')) return false;
+      if (t.includes('endurance') || t.includes('le mans') || id.includes('le-mans')) return false;
+      if (t.includes('formula 1') || t.includes('f1') || t.includes('grand prix') || t.includes('gp')) return true;
+      if (id.includes('formula-1') || id.includes('formula1') || id.includes('grand-prix')) return true;
+      if (t.includes('practice') || t.includes('qualifying')) return true;
+      return false;
+    }
+
+    async function loadStreams() {
+      const el = document.getElementById('mScroll');
+      const status = document.getElementById('streamStatus');
+      try {
+        const ctrl = new AbortController();
+        const timer = setTimeout(() => ctrl.abort(), 10000);
+        const r = await fetch(STREAM_API + '/matches/motor-sports', { signal: ctrl.signal });
+        clearTimeout(timer);
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        const data = await r.json();
+        allMatches = (Array.isArray(data) ? data : []).filter(isF1Match);
+        document.getElementById('mCnt').textContent = allMatches.length + ' sessions';
+        document.getElementById('liveTxt').textContent = allMatches.length > 0 ? allMatches.length + ' Live' : 'Live';
+        status.textContent = allMatches.length > 0 ? allMatches.length + ' sessions' : 'No live sessions';
+        renderRows(allMatches);
+      } catch (e) {
+        const timeout = e.name === 'AbortError';
+        el.innerHTML = `<div class="empty-state">
+          ${timeout ? 'Request timed out' : 'No live sessions found'}
+          <br><br>Sessions appear on race weekends.<br>
+          <a href="https://www.f1tv.formula1.com" target="_blank" style="color:var(--teal)">F1 TV Pro</a> ·
+          <a href="https://www.youtube.com/@F1" target="_blank" style="color:var(--red)">F1 YouTube</a>
+        </div>`;
+        status.textContent = timeout ? 'Timeout' : 'API unavailable';
+      }
+    }
+
+    function filterSessions(type, el) {
+      document.querySelectorAll('.stream-tab').forEach(t => {
+        t.classList.remove('active');
+        t.setAttribute('aria-selected', 'false');
+        t.tabIndex = -1;
+      });
+      el.classList.add('active');
+      el.setAttribute('aria-selected', 'true');
+      el.tabIndex = 0;
+      if (type === 'all') { renderRows(allMatches); return; }
+      const kw = { practice: ['fp', 'free practice', 'practice'], qual: ['qual', 'qualifying', 'sprint qual'], race: ['race', 'grand prix', 'gp', 'sprint race'] };
+      const keys = kw[type] || [];
+      const filtered = allMatches.filter(m => keys.some(k => (m.title || '').toLowerCase().includes(k)));
+      renderRows(filtered.length ? filtered : allMatches);
+    }
+
+    function renderRows(matches) {
+      const sc = document.getElementById('mScroll');
+      if (!matches || !matches.length) {
+        sc.innerHTML = '<div class="empty-state">No sessions match this filter.</div>';
+        return;
+      }
+      sc.innerHTML = '';
+      matches.forEach(m => {
+        const el = document.createElement('div');
+        el.className = 'stream-row';
+        let timeStr = '—';
+        try { const d = new Date(m.date); if (!isNaN(d)) timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); } catch (e) {}
+        const isLive = m.sources && m.sources.length > 0;
+        const chips = (m.sources || []).slice(0, 4).map(s => {
+          const hd = (s.source || '').toLowerCase().includes('hd');
+          return '<span class="stream-chip' + (hd ? ' hd' : '') + '">' + (s.source || 'src') + '</span>';
+        }).join('');
+        el.innerHTML = '<div class="stream-row-top"><span class="stream-cat">F1</span><span class="stream-time">' + timeStr + '</span></div><div class="stream-title">' + (m.title || 'Unnamed Session') + '</div><div class="stream-chips">' + chips + (isLive ? '' : '<span class="stream-chip">No sources</span>') + '</div>';
+        el.addEventListener('click', () => selectMatch(m, el));
+        sc.appendChild(el);
+      });
+    }
+
+    async function selectMatch(match, el) {
+      if (activeRow) activeRow.classList.remove('active');
+      el.classList.add('active');
+      activeRow = el;
+      const iframe = document.getElementById('f1iframe');
+      const ph = document.getElementById('pPH');
+      const errDiv = document.getElementById('streamErr');
+      iframe.style.display = 'none';
+      iframe.src = '';
+      ph.style.display = 'flex';
+      errDiv.classList.remove('show');
+      ph.querySelector('.stream-placeholder-title').textContent = 'Loading Stream…';
+      ph.querySelector('.stream-placeholder-sub').textContent = 'Fetching sources';
+      document.getElementById('pCtrl').style.display = 'none';
+      const sources = match.sources || [];
+      if (!sources.length) { ph.style.display = 'none'; errDiv.classList.add('show'); return; }
+      const streams = [];
+      await Promise.allSettled(sources.map(async src => {
+        try {
+          const ctrl = new AbortController();
+          const timer = setTimeout(() => ctrl.abort(), 8000);
+          const r = await fetch(STREAM_API + '/stream/' + src.source + '/' + src.id, { signal: ctrl.signal });
+          clearTimeout(timer);
+          if (!r.ok) return;
+          const d = await r.json();
+          if (Array.isArray(d)) d.forEach(s => streams.push({ ...s, _src: src.source, _srcId: src.id }));
+        } catch (e) {}
+      }));
+      if (!streams.length) { ph.style.display = 'none'; errDiv.classList.add('show'); return; }
+      ph.style.display = 'none';
+      errDiv.classList.remove('show');
+      iframe.style.display = 'block';
+      iframe.src = streams[0].embedUrl || '';
+      const ctrl = document.getElementById('pCtrl');
+      ctrl.style.display = 'flex';
+      document.getElementById('pNm').textContent = match.title || 'F1 Session';
+      const tl = (match.title || '').toLowerCase();
+      document.getElementById('pSessionType').textContent =
+        tl.includes('race') && !tl.includes('sprint') ? 'Race' :
+        tl.includes('sprint race') ? 'Sprint Race' :
+        tl.includes('sprint qual') ? 'Sprint Qualifying' :
+        tl.includes('qual') ? 'Qualifying' :
+        tl.includes('fp1') || tl.includes('practice 1') ? 'Free Practice 1' :
+        tl.includes('fp2') || tl.includes('practice 2') ? 'Free Practice 2' :
+        tl.includes('fp3') || tl.includes('practice 3') ? 'Free Practice 3' : 'Session';
+      const btns = document.getElementById('sBtns');
+      btns.innerHTML = '';
+      streams.forEach((s, i) => {
+        const b = document.createElement('button');
+        b.className = 'stream-src-btn' + (i === 0 ? ' active' : '');
+        const hd = s.hd || (s._src || '').toLowerCase().includes('hd');
+        b.innerHTML = (s.language || s._src || 'Source') + ' #' + (s.streamNo || i + 1) + (hd ? ' <span class="badge badge-teal" style="font-size:6px;padding:1px 4px;">HD</span>' : '');
+        b.addEventListener('click', () => {
+          document.querySelectorAll('.stream-src-btn').forEach(x => x.classList.remove('active'));
+          b.classList.add('active');
+          iframe.src = s.embedUrl || '';
+        });
+        btns.appendChild(b);
+      });
+    }
+
+    // ═══════════════════════════════════════════════
+    //  SCROLL FADE-IN
+    // ═══════════════════════════════════════════════
+    const obs = new IntersectionObserver(
+      es => es.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); }),
+      { threshold: 0.06 }
+    );
+    document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+    // ═══════════════════════════════════════════════
+    //  INIT
+    // ═══════════════════════════════════════════════
+    buildTimingStrip();
+    buildSchedule();
+    buildDrivers();
+    buildCons();
+    renderHL(HIGHLIGHTS);
+    loadStreams();
+  </script>
+</body>
+</html>

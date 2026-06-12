@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Standings · F1 2026 — APEX</title>
+  <link rel="icon" type="image/x-icon" href="f1-logo.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="f1-logo.svg" alt="F1" style="height:24px;width:auto;">
+      <span class="nav-logo-text"><em>APEX</em></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Live</a></li>
+      <li><a href="standings.html" class="active">Standings</a></li>
+      <li><a href="drivers.html">Drivers</a></li>
+      <li><a href="calendar.html">Calendar</a></li>
+      <li><a href="tracks.html">Tracks</a></li>
+      <li><a href="teams.html">Teams</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-round">After Rd 6 · Monaco</span>
+      <div class="live-pill"><span class="live-dot"></span><span>Standings</span></div>
+    </div>
+  </nav>
+
+  <div class="timing-strip">
+    <div class="timing-strip-inner">
+      <span class="strip-label" aria-hidden="true">Positions</span>
+      <div class="strip-entries" id="stripEntries" aria-live="polite" aria-label="Live timing positions"></div>
+    </div>
+  </div>
+
+  <div class="page-wrap" id="main-content">
+    <section class="section">
+      <div class="section-header">
+        <span class="section-eyebrow">CHAMPIONSHIP</span>
+        <h1 class="section-title">2026 Standings</h1>
+        <span class="section-sub">After Rd 6 — Monaco</span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--s-6);">
+        <!-- DRIVERS -->
+        <div class="standings-wrap">
+          <div class="standings-header">
+            <span class="standings-header-title">Drivers</span>
+            <span class="badge badge-muted">22 Drivers</span>
+          </div>
+          <div id="drvTblFull"></div>
+        </div>
+
+        <!-- CONSTRUCTORS -->
+        <div class="standings-wrap">
+          <div class="standings-header">
+            <span class="standings-header-title">Constructors</span>
+            <span class="badge badge-muted">11 Teams</span>
+          </div>
+          <div id="conTblFull"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-header">
+        <span class="section-eyebrow">POINTS</span>
+        <h2 class="section-title">Scoring System</h2>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:var(--s-2);max-width:640px;">
+        <div style="text-align:center;padding:var(--s-3);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-sm);"><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--gold);">25</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-top:2px;">P1</div></div>
+        <div style="text-align:center;padding:var(--s-3);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-sm);"><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--silver);">18</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-top:2px;">P2</div></div>
+        <div style="text-align:center;padding:var(--s-3);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-sm);"><div style="font-family:var(--display);font-size:20px;font-weight:700;color:var(--bronze);">15</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-top:2px;">P3</div></div>
+        <div style="text-align:center;padding:var(--s-3);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-sm);"><div style="font-family:var(--display);font-size:20px;font-weight:700;">12</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-top:2px;">P4</div></div>
+        <div style="text-align:center;padding:var(--s-3);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-sm);"><div style="font-family:var(--display);font-size:20px;font-weight:700;">10</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-top:2px;">P5</div></div>
+        <div style="text-align:center;padding:var(--s-3);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-sm);"><div style="font-family:var(--display);font-size:20px;font-weight:700;">8</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-top:2px;">P6</div></div>
+        <div style="text-align:center;padding:var(--s-3);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-sm);"><div style="font-family:var(--display);font-size:20px;font-weight:700;">6</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-top:2px;">P7</div></div>
+        <div style="text-align:center;padding:var(--s-3);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-sm);"><div style="font-family:var(--display);font-size:20px;font-weight:700;">4</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-top:2px;">P8</div></div>
+        <div style="text-align:center;padding:var(--s-3);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-sm);"><div style="font-family:var(--display);font-size:20px;font-weight:700;">2</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-top:2px;">P9</div></div>
+        <div style="text-align:center;padding:var(--s-3);background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-sm);"><div style="font-family:var(--display);font-size:20px;font-weight:700;">1</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-muted);margin-top:2px;">P10</div></div>
+      </div>
+      <div style="font-family:var(--mono);font-size:10px;color:var(--text-tertiary);margin-top:var(--s-3);">+1 point for fastest lap (if in top 10)</div>
+    </section>
+
+    <footer>
+      <div class="footer-logo"><img src="f1-logo.svg" alt="F1" style="height:18px;display:inline-block;vertical-align:middle;margin-right:6px;"><em>APEX</em></div>
+      <div class="footer-links">
+        <a href="https://www.formula1.com" target="_blank" rel="noopener">Official F1</a>
+        <a href="https://www.youtube.com/@F1" target="_blank" rel="noopener">F1 YouTube</a>
+        <a href="https://www.f1tv.formula1.com" target="_blank" rel="noopener">F1 TV</a>
+      </div>
+      <div class="footer-note">Data: 2026 F1 World Championship</div>
+    </footer>
+  </div>
+
+  <script src="data.js"></script>
+  <script>
+    function buildStrip() {
+      document.getElementById('stripEntries').innerHTML = DRIVERS.slice(0, 10).map((d, i) => {
+        const c = TEAM_COLORS[d.team] || '#666';
+        const pc = i === 0 ? 'p1' : i === 1 ? 'p2' : i === 2 ? 'p3' : '';
+        return '<div class="strip-entry"><span class="strip-pos ' + pc + '">' + (i + 1) + '</span><span class="strip-team-dot" style="background:' + c + '"></span><span class="strip-driver">' + d.s + '</span><span class="strip-gap' + (i === 0 ? ' leader' : '') + '">' + (i === 0 ? 'LEAD' : '+' + (1 + i * 2).toFixed(1)) + '</span></div>';
+      }).join('');
+    }
+
+    function buildDrivers() {
+      const mx = DRIVERS[0].pts;
+      document.getElementById('drvTblFull').innerHTML = DRIVERS.map(d => {
+        const pc = d.pos === 1 ? 'p1' : d.pos === 2 ? 'p2' : d.pos === 3 ? 'p3' : 'px';
+        const c = TEAM_COLORS[d.team] || '#666';
+        const primary = DRIVER_PHOTOS[d.s];
+        const fallback = DRIVER_FALLBACK[d.s];
+        let img = '';
+        if (primary) {
+          const fe = fallback ? 'onerror="this.src=\'' + fallback + '\';this.onerror=function(){this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';}"' : 'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"';
+          img = '<img src="' + primary + '" alt="' + d.s + '" style="width:100%;height:100%;object-fit:cover;object-position:top;" ' + fe + '>';
+        } else if (fallback) {
+          img = '<img src="' + fallback + '" alt="' + d.s + '" style="width:100%;height:100%;object-fit:cover;object-position:top;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">';
+        }
+        return '<div class="standings-row" onclick="location.href=\'drivers.html#' + d.s + '\'">' +
+          '<div class="st-pos ' + pc + '">' + d.pos + '</div>' +
+          '<div class="st-avatar" style="border:1.5px solid ' + c + '44;background:' + c + '11;">' + img +
+          '<span style="font-family:var(--mono);font-size:7px;color:' + c + ';display:' + (img ? 'none' : 'flex') + '">' + d.s + '</span></div>' +
+          '<div style="flex:1;min-width:0"><div class="st-name">' + d.name + '</div><div class="st-team" style="color:' + c + '">' + d.team + '</div></div>' +
+          '<div class="st-bar-wrap"><div class="st-bar-fill" style="width:' + (mx > 0 ? (d.pts / mx * 100).toFixed(1) : 0) + '%;background:' + c + '"></div></div>' +
+          '<div class="st-pts" style="color:' + c + '">' + d.pts + '<span class="st-pts-label">pts</span></div></div>';
+      }).join('');
+    }
+
+    function buildCons() {
+      const mx = CONS[0].pts;
+      document.getElementById('conTblFull').innerHTML = CONS.map(c => {
+        const pc = c.pos === 1 ? 'p1' : c.pos === 2 ? 'p2' : c.pos === 3 ? 'p3' : 'px';
+        return '<div class="standings-row"><div class="st-pos ' + pc + '">' + c.pos + '</div>' +
+          '<div class="st-team-dot" style="background:' + c.c + ';width:10px;height:10px;"></div>' +
+          '<div style="flex:1"><div class="st-name">' + c.name + '</div></div>' +
+          '<div class="st-bar-wrap"><div class="st-bar-fill" style="width:' + (c.pts > 0 ? (c.pts / mx * 100).toFixed(1) : 0) + '%;background:' + c.c + '"></div></div>' +
+          '<div class="st-pts" style="color:' + c.c + '">' + c.pts + '<span class="st-pts-label">pts</span></div></div>';
+      }).join('');
+    }
+
+    buildStrip();
+    buildDrivers();
+    buildCons();
+  </script>
+</body>
+</html>

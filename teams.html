@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teams · F1 2026 — APEX</title>
+  <link rel="icon" type="image/x-icon" href="f1-logo.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav>
+    <a href="index.html" class="nav-logo"><img src="f1-logo.svg" alt="F1" style="height:24px;width:auto;"><span class="nav-logo-text"><em>APEX</em></span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Live</a></li>
+      <li><a href="standings.html">Standings</a></li>
+      <li><a href="drivers.html">Drivers</a></li>
+      <li><a href="calendar.html">Calendar</a></li>
+      <li><a href="tracks.html">Tracks</a></li>
+      <li><a href="teams.html" class="active">Teams</a></li>
+    </ul>
+    <div class="nav-right"><span class="nav-round">11 Constructors</span><div class="live-pill"><span class="live-dot"></span><span>2026</span></div></div>
+  </nav>
+  <div class="timing-strip"><div class="timing-strip-inner"><span class="strip-label" aria-hidden="true">Teams</span><div class="strip-entries" id="stripEntries" aria-live="polite" aria-label="Teams list"></div></div></div>
+  <div class="page-wrap" id="main-content">
+    <section class="section">
+      <div class="section-header"><span class="section-eyebrow">CONSTRUCTORS</span><h1 class="section-title">2026 Teams</h1><span class="section-sub">11 Constructors</span></div>
+      <div class="teams-grid" id="teamsGrid"></div>
+    </section>
+
+    <section class="section">
+      <div class="section-header"><span class="section-eyebrow">TYRES</span><h2 class="section-title">Compounds &amp; Rules</h2></div>
+      <div class="info-panels">
+        <div class="info-panel">
+          <div class="info-panel-title">Tyre Compounds · 2026</div>
+          <div class="tyre-row">
+            <div style="text-align:center"><div class="tyre tyre-soft">S</div><div class="tyre-label">Soft</div></div>
+            <div style="text-align:center"><div class="tyre tyre-medium">M</div><div class="tyre-label">Medium</div></div>
+            <div style="text-align:center"><div class="tyre tyre-hard">H</div><div class="tyre-label">Hard</div></div>
+            <div style="text-align:center"><div class="tyre tyre-inter">I</div><div class="tyre-label">Inter</div></div>
+            <div style="text-align:center"><div class="tyre tyre-wet">W</div><div class="tyre-label">Wet</div></div>
+          </div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text-tertiary);margin-top:var(--s-3);line-height:1.6;">Each team must use at least 2 dry compounds per race. Inters and wets are optional.</div>
+        </div>
+        <div class="info-panel">
+          <div class="info-panel-title">DRS — Drag Reduction</div>
+          <div style="display:flex;flex-direction:column;gap:var(--s-2);">
+            <div class="drs-badge drs-on"><svg class="icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> DRS Open — detection zone active</div>
+            <div class="drs-badge drs-off"><svg class="icon" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> DRS Closed — within 1 sec gap</div>
+          </div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text-tertiary);margin-top:var(--s-3);line-height:1.6;">DRS opens the rear wing flap, reducing drag by ~80 points, adding ~12 km/h. Active when within 1 second of car ahead.</div>
+        </div>
+        <div class="info-panel">
+          <div class="info-panel-title">Points System</div>
+          <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:var(--s-1);">
+            {[25,18,15,12,10,8,6,4,2,1].map((pts,i) =>
+              '<div style="text-align:center;padding:6px 2px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-sm);"><div style="font-family:var(--display);font-size:14px;font-weight:700;'+(i===0?'color:var(--gold)':i===1?'color:var(--silver)':i===2?'color:var(--bronze)':'')+'">'+pts+'</div><div style="font-size:7px;color:var(--text-muted);font-family:var(--mono);">P'+(i+1)+'</div></div>'
+            ).join('')}
+          </div>
+          <div style="font-family:var(--mono);font-size:9px;color:var(--text-tertiary);margin-top:var(--s-2);">+1 pt for fastest lap (top 10)</div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-logo"><img src="f1-logo.svg" style="height:18px;display:inline-block;vertical-align:middle;margin-right:6px;"><em>APEX</em></div>
+      <div class="footer-links"><a href="https://www.formula1.com" target="_blank" rel="noopener">Official F1</a><a href="https://www.youtube.com/@F1" target="_blank" rel="noopener">F1 YouTube</a><a href="https://www.f1tv.formula1.com" target="_blank" rel="noopener">F1 TV</a></div>
+      <div class="footer-note">Data: 2026 F1 World Championship</div>
+    </footer>
+  </div>
+  <script src="data.js"></script>
+  <script>
+    function buildStrip() {
+      document.getElementById('stripEntries').innerHTML = DRIVERS.slice(0,6).map((d,i) => {
+        const c = TEAM_COLORS[d.team]||'#666';
+        return '<div class="strip-entry"><span class="strip-pos '+(i===0?'p1':i===1?'p2':i===2?'p3':'')+'">'+(i+1)+'</span><span class="strip-team-dot" style="background:'+c+'"></span><span class="strip-driver">'+d.s+'</span></div>';
+      }).join('');
+    }
+    function buildTeams() {
+      const mx = TEAMS[0].pts;
+      document.getElementById('teamsGrid').innerHTML = TEAMS.map(t =>
+        '<div class="team-card"><div class="team-card-top"><div class="team-header">' +
+        '<div class="team-bar" style="background:'+t.c+';box-shadow:0 0 8px '+t.c+'44"></div>' +
+        (t.logo ? '<div class="team-logo-wrap"><img class="team-logo" src="'+t.logo+'" alt="'+t.name+'" loading="lazy" onerror="this.parentNode.style.display=\'none\'"></div>' : '') +
+        '<div><div class="team-name" style="color:'+t.c+'">'+t.name+'</div><div style="font-family:var(--mono);font-size:8px;color:var(--text-tertiary);margin-top:1px;">Constructor</div></div>' +
+        '<div class="team-pts" style="color:'+t.c+'">'+t.pts+'<span style="font-size:10px;color:var(--text-muted);font-family:var(--mono);margin-left:2px;">pts</span></div></div>' +
+        '<div class="team-pts-bar"><div class="team-pts-fill" style="width:'+(t.pts > 0 ? (t.pts / mx * 100).toFixed(1) : 1)+'%;background:'+t.c+'"></div></div></div>' +
+        '<div class="team-drivers">' +
+        '<div class="team-driver" style="border-top:2px solid '+t.c+'"><div class="team-driver-num" style="color:'+t.c+'">'+t.d1n+'</div><div class="team-driver-name">'+t.d1+'</div><div class="team-driver-pts">'+t.d1p+' pts</div></div>' +
+        '<div class="team-driver" style="border-top:2px solid '+t.c+'66"><div class="team-driver-num" style="color:'+t.c+'88">'+t.d2n+'</div><div class="team-driver-name">'+t.d2+'</div><div class="team-driver-pts">'+t.d2p+' pts</div></div>' +
+        '</div></div>'
+      ).join('');
+    }
+    buildStrip();
+    buildTeams();
+  </script>
+</body>
+</html>

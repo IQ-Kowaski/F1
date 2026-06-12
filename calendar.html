@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar · F1 2026 — APEX</title>
+  <link rel="icon" type="image/x-icon" href="f1-logo.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+  <nav>
+    <a href="index.html" class="nav-logo"><img src="f1-logo.svg" alt="F1" style="height:24px;width:auto;"><span class="nav-logo-text"><em>APEX</em></span></a>
+    <ul class="nav-links">
+      <li><a href="index.html">Live</a></li>
+      <li><a href="standings.html">Standings</a></li>
+      <li><a href="drivers.html">Drivers</a></li>
+      <li><a href="calendar.html" class="active">Calendar</a></li>
+      <li><a href="tracks.html">Tracks</a></li>
+      <li><a href="teams.html">Teams</a></li>
+    </ul>
+    <div class="nav-right"><span class="nav-round">22 Rounds</span><div class="live-pill"><span class="live-dot"></span><span>2026</span></div></div>
+  </nav>
+  <div class="timing-strip"><div class="timing-strip-inner"><span class="strip-label" aria-hidden="true">Race</span><div class="strip-entries" id="stripEntries" aria-live="polite" aria-label="Live timing positions"></div></div></div>
+  <div class="page-wrap" id="main-content">
+    <section class="section">
+      <div class="section-header"><span class="section-eyebrow">SCHEDULE</span><h1 class="section-title">2026 Calendar</h1><span class="section-sub">22 Rounds</span></div>
+      <div class="calendar-grid" id="calGrid"></div>
+    </section>
+    <footer>
+      <div class="footer-logo"><img src="f1-logo.svg" style="height:18px;display:inline-block;vertical-align:middle;margin-right:6px;"><em>APEX</em></div>
+      <div class="footer-links"><a href="https://www.formula1.com" target="_blank" rel="noopener">Official F1</a><a href="https://www.youtube.com/@F1" target="_blank" rel="noopener">F1 YouTube</a><a href="https://www.f1tv.formula1.com" target="_blank" rel="noopener">F1 TV</a></div>
+      <div class="footer-note">Data: 2026 F1 World Championship</div>
+    </footer>
+  </div>
+  <script src="data.js"></script>
+  <script>
+    function buildStrip() {
+      document.getElementById('stripEntries').innerHTML = DRIVERS.slice(0,6).map((d,i) => {
+        const c = TEAM_COLORS[d.team]||'#666';
+        return '<div class="strip-entry"><span class="strip-pos '+(i===0?'p1':i===1?'p2':i===2?'p3':'')+'">'+(i+1)+'</span><span class="strip-team-dot" style="background:'+c+'"></span><span class="strip-driver">'+d.s+'</span></div>';
+      }).join('');
+    }
+    function buildCal() {
+      const sm = { done: 'done', current: 'live', upcoming: 'upcoming', cancelled: 'cancelled' };
+      const sl = { done: 'Done', current: 'This Weekend', upcoming: 'Upcoming', cancelled: 'Cancelled' };
+      document.getElementById('calGrid').innerHTML = CAL.map(r => {
+        const schedHTML = r.sched ? '<div class="race-schedule">' +
+          (r.sched.fp1 ? '<div class="race-sched-row"><span>FP1</span><span>'+r.sched.fp1+'</span></div>' : '') +
+          (r.sched.fp2 ? '<div class="race-sched-row"><span>FP2</span><span>'+r.sched.fp2+'</span></div>' : '') +
+          (r.sched.fp3 ? '<div class="race-sched-row"><span>FP3</span><span>'+r.sched.fp3+'</span></div>' : '') +
+          (r.sched.sq ? '<div class="race-sched-row"><span>Sprint Qual</span><span>'+r.sched.sq+'</span></div>' : '') +
+          (r.sched.sr ? '<div class="race-sched-row"><span>Sprint</span><span>'+r.sched.sr+'</span></div>' : '') +
+          (r.sched.q ? '<div class="race-sched-row"><span>Qualifying</span><span>'+r.sched.q+'</span></div>' : '') +
+          (r.sched.r ? '<div class="race-sched-row race"><span>Race</span><span>'+r.sched.r+'</span></div>' : '') +
+          '</div>' : '';
+        return '<div class="race-card ' + (r.st === 'done' || r.st === 'cancelled' ? 'past' : '') + ' ' + (r.st === 'current' ? 'current' : '') + '">' +
+          '<div class="race-card-accent"></div>' +
+          '<div class="race-card-top"><div><div class="race-round">' + (r.st === 'cancelled' ? 'CANCELLED' : 'RD ' + r.rd) + '</div>' + (r.sprint ? '<span class="race-tag" style="margin-top:3px;">SPRINT</span>' : '') + '</div><div class="race-flag">' + r.flag + '</div></div>' +
+          '<div><div class="race-name">' + r.nm + '</div><div class="race-circuit-name">' + r.circ + '</div></div>' +
+          schedHTML +
+          '<div class="race-bottom"><div class="race-dates">' + r.dates + '</div><div class="race-status ' + sm[r.st] + '">' + sl[r.st] + '</div></div></div>';
+      }).join('');
+    }
+    buildStrip();
+    buildCal();
+  </script>
+</body>
+</html>

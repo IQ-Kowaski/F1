@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drivers · F1 2026 — APEX</title>
+  <link rel="icon" type="image/x-icon" href="f1-logo.svg">
+  <meta name="description" content="Full 2026 Formula 1 driver grid — profiles, stats, career data, and race results.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+<img src="f1-logo.svg" alt="F1" style="height:24px;width:auto;">
+      <span class="nav-logo-text"><em>APEX</em></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Live</a></li>
+      <li><a href="standings.html">Standings</a></li>
+      <li><a href="drivers.html" class="active">Drivers</a></li>
+      <li><a href="calendar.html">Calendar</a></li>
+      <li><a href="tracks.html">Tracks</a></li>
+      <li><a href="teams.html">Teams</a></li>
+    </ul>
+    <div class="nav-right">
+      <span class="nav-round">2026 Grid</span>
+      <div class="live-pill">
+        <span class="live-dot"></span>
+        <span>22 Drivers</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- TIMING STRIP -->
+  <div class="timing-strip">
+    <div class="timing-strip-inner">
+      <span class="strip-label" aria-hidden="true">Positions</span>
+      <div class="strip-entries" id="stripEntries" aria-live="polite" aria-label="Live timing positions"></div>
+    </div>
+  </div>
+
+  <!-- PAGE WRAPPER -->
+  <div class="page-wrap" id="main-content">
+
+    <!-- MAIN GRID VIEW -->
+    <div id="gridView">
+      <section class="section">
+        <div class="section-header">
+          <span class="section-eyebrow">GRID</span>
+          <h1 class="section-title">2026 Drivers</h1>
+          <span class="section-sub">22 Drivers · 11 Teams</span>
+        </div>
+        <div class="driver-grid" id="drvGrid"></div>
+      </section>
+    </div>
+
+    <!-- DRIVER DETAIL PAGE -->
+    <div id="driverDetail" class="detail-page" style="display:none;">
+      <div class="detail-container">
+        <button class="back-btn" onclick="backToGrid()"><svg class="icon" width="14" height="14" viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>All Drivers</button>
+        <div class="detail-grid">
+          <div class="detail-left">
+            <div class="detail-bar" id="dModalBar"></div>
+            <div class="detail-photo-wrap" id="dModalPhotoWrap"></div>
+            <div class="detail-name" id="dModalName"></div>
+            <div class="detail-team-label" id="dModalTeam"></div>
+            <div class="detail-number" id="dModalNum"></div>
+            <div class="detail-stats">
+              <div class="detail-stat-box">
+                <div class="detail-stat-value" id="dModalPos"></div>
+                <div class="detail-stat-label">Standing</div>
+              </div>
+              <div class="detail-stat-box">
+                <div class="detail-stat-value" id="dModalPts"></div>
+                <div class="detail-stat-label">Points</div>
+              </div>
+            </div>
+          </div>
+          <div class="detail-right">
+            <div class="detail-tabs" role="tablist" aria-label="Driver information tabs">
+              <div class="detail-tab active" role="tab" aria-selected="true" tabindex="0" onclick="switchTab('bio')" onkeydown="if(event.key==='Enter')switchTab('bio')">About</div>
+              <div class="detail-tab" role="tab" aria-selected="false" tabindex="-1" onclick="switchTab('stats')" onkeydown="if(event.key==='Enter')switchTab('stats')">Career</div>
+              <div class="detail-tab" role="tab" aria-selected="false" tabindex="-1" onclick="switchTab('races')" onkeydown="if(event.key==='Enter')switchTab('races')">2026 Results</div>
+              <div class="detail-tab" role="tab" aria-selected="false" tabindex="-1" onclick="switchTab('videos')" onkeydown="if(event.key==='Enter')switchTab('videos')">Videos</div>
+            </div>
+            <div class="detail-pane active" id="paneBio" role="tabpanel">
+              <div class="detail-pane-title">Biography</div>
+              <div class="detail-pane-text" id="dBio"></div>
+              <div class="detail-meta-grid">
+                <div class="detail-meta-item"><span class="detail-meta-label">Born</span><span class="detail-meta-value" id="dBorn"></span></div>
+                <div class="detail-meta-item"><span class="detail-meta-label">Origin</span><span class="detail-meta-value" id="dOrigin"></span></div>
+              </div>
+            </div>
+            <div class="detail-pane" id="paneStats" role="tabpanel">
+              <div class="detail-pane-title">Career Statistics</div>
+              <div class="detail-stats-grid">
+                <div class="detail-stat-card"><div class="detail-stat-card-value gold" id="dStatChamp"></div><div class="detail-stat-card-label">World Titles</div></div>
+                <div class="detail-stat-card"><div class="detail-stat-card-value" id="dStatWins"></div><div class="detail-stat-card-label">Wins</div></div>
+                <div class="detail-stat-card"><div class="detail-stat-card-value" id="dStatPoles"></div><div class="detail-stat-card-label">Poles</div></div>
+                <div class="detail-stat-card"><div class="detail-stat-card-value" id="dStatPodiums"></div><div class="detail-stat-card-label">Podiums</div></div>
+                <div class="detail-stat-card"><div class="detail-stat-card-value" id="dStatStarts"></div><div class="detail-stat-card-label">Starts</div></div>
+              </div>
+            </div>
+            <div class="detail-pane" id="paneRaces" role="tabpanel">
+              <div class="detail-pane-title">2026 Season Results</div>
+              <div class="detail-races-grid" id="dRacesGrid"></div>
+            </div>
+            <div class="detail-pane" id="paneVideos" role="tabpanel">
+              <div class="detail-pane-title">Driver Highlights</div>
+              <div class="detail-videos-grid" id="dVidsGrid"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-logo"><img src="f1-logo.svg" style="height:18px;display:inline-block;vertical-align:middle;margin-right:6px;"><em>APEX</em></div>
+      <div class="footer-links">
+        <a href="https://www.formula1.com" target="_blank" rel="noopener">Official F1</a>
+        <a href="https://www.youtube.com/@F1" target="_blank" rel="noopener">F1 YouTube</a>
+        <a href="https://www.f1tv.formula1.com" target="_blank" rel="noopener">F1 TV</a>
+      </div>
+      <div class="footer-note">Data: 2026 F1 World Championship</div>
+    </footer>
+  </div>
+
+  <script src="data.js"></script>
+  <script>
+    // ═══ TIMING STRIP ═══
+    function buildStrip() {
+      document.getElementById('stripEntries').innerHTML = DRIVERS.slice(0, 10).map((d, i) => {
+        const c = TEAM_COLORS[d.team] || '#666';
+        const pc = i === 0 ? 'p1' : i === 1 ? 'p2' : i === 2 ? 'p3' : '';
+        return '<div class="strip-entry"><span class="strip-pos ' + pc + '">' + (i + 1) + '</span><span class="strip-team-dot" style="background:' + c + '"></span><span class="strip-driver">' + d.s + '</span><span class="strip-gap' + (i === 0 ? ' leader' : '') + '">' + (i === 0 ? 'LEAD' : '+' + (1 + i * 2).toFixed(1)) + '</span></div>';
+      }).join('');
+    }
+
+    // ═══ DRIVER PHOTO HELPER ═══
+    function driverPhoto(abbr, fallbackText) {
+      const p = DRIVER_PHOTOS[abbr];
+      const f = DRIVER_FALLBACK[abbr];
+      if (p) {
+        const fe = f ? 'onerror="this.src=\'' + f + '\';this.onerror=null;"' : 'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';"';
+        return '<img src="' + p + '" alt="' + abbr + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top;" ' + fe + '>';
+      }
+      if (f) return '<img src="' + f + '" alt="' + abbr + '" loading="lazy" style="width:100%;height:100%;object-fit:cover;object-position:top;" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\';">';
+      return '';
+    }
+
+    // ═══ BUILD DRIVER GRID ═══
+    function buildGrid() {
+      document.getElementById('drvGrid').innerHTML = DRIVERS.map(d => {
+        const c = TEAM_COLORS[d.team] || '#666';
+        const pc = d.pos === 1 ? 'pos-gold' : d.pos === 2 ? 'pos-silver' : d.pos === 3 ? 'pos-bronze' : 'pos-other';
+        const photo = driverPhoto(d.s, d.s);
+        const hasPhoto = !!DRIVER_PHOTOS[d.s] || !!DRIVER_FALLBACK[d.s];
+        return '<div class="driver-card" onclick="showDriver(\'' + d.s + '\')">' +
+          '<div class="driver-card-bar" style="background:linear-gradient(90deg,' + c + ',' + c + '88)"></div>' +
+          '<div class="driver-card-body">' +
+          '<div style="display:flex;align-items:flex-start;gap:var(--s-3);position:relative;">' +
+          '<div class="driver-number" style="color:' + c + '">' + d.num + '</div>' +
+          '<div class="driver-photo-wrap" style="border-color:' + c + '44">' +
+          photo +
+          '<div class="driver-photo-fallback" style="color:' + c + ';display:' + (hasPhoto ? 'none' : 'flex') + '">' + d.nat + '</div>' +
+          '</div>' +
+          '<div class="driver-info">' +
+          '<div style="display:flex;align-items:center;gap:4px;"><span class="driver-abbr">' + d.s + '</span><span>' + d.nat + '</span></div>' +
+          '<div class="driver-name" style="color:' + c + '">' + d.name + '</div>' +
+          '<div class="driver-team" style="color:' + c + '99">' + d.team + '</div>' +
+          '</div></div>' +
+          '<div class="driver-stats-row">' +
+          '<div class="driver-pts" style="color:' + c + '">' + d.pts + '<small>pts</small></div>' +
+          '<div class="driver-pos-badge ' + pc + '">' + d.pos + '</div>' +
+          '</div>' +
+          '<div class="driver-extra">' +
+          '<div class="driver-stat"><div class="driver-stat-val" style="color:' + c + '">' + d.wins + '</div><div class="driver-stat-label">Wins</div></div>' +
+          '<div class="driver-stat"><div class="driver-stat-val" style="color:' + c + '">' + d.poles + '</div><div class="driver-stat-label">Poles</div></div>' +
+          '<div class="driver-stat"><div class="driver-stat-val" style="color:var(--text-tertiary)">#' + d.num + '</div><div class="driver-stat-label">Number</div></div>' +
+          '</div></div></div>';
+      }).join('');
+    }
+
+    // ═══ DRIVER DETAIL ═══
+    function showDriver(abbr) {
+      const d = DRIVERS.find(x => x.s === abbr);
+      if (!d) return;
+      const det = DRIVER_DETAILS[abbr] || {};
+      const c = TEAM_COLORS[d.team] || '#e10600';
+
+      document.getElementById('dModalBar').style.background = 'linear-gradient(180deg,' + c + ',' + c + '44)';
+
+      const wrap = document.getElementById('dModalPhotoWrap');
+      wrap.style.borderColor = c;
+      const photo = driverPhoto(abbr, d.s);
+      const hasPhoto = !!DRIVER_PHOTOS[abbr] || !!DRIVER_FALLBACK[abbr];
+      wrap.innerHTML = photo + '<div class="driver-photo-fallback" style="color:' + c + ';display:' + (hasPhoto ? 'none' : 'flex') + '">' + d.nat + '</div>';
+
+      document.getElementById('dModalName').textContent = d.full;
+      document.getElementById('dModalName').style.color = c;
+      document.getElementById('dModalTeam').textContent = d.nat + '  ' + d.team;
+      document.getElementById('dModalTeam').style.color = c + 'bb';
+      document.getElementById('dModalNum').textContent = '#' + d.num;
+      document.getElementById('dModalNum').style.color = c;
+      document.getElementById('dModalPos').textContent = 'P' + d.pos;
+      document.getElementById('dModalPos').style.color = c;
+      document.getElementById('dModalPts').textContent = d.pts;
+      document.getElementById('dModalPts').style.color = c;
+
+      document.getElementById('dBio').textContent = det.bio || 'Biography coming soon.';
+      document.getElementById('dBorn').textContent = d.born || '—';
+      document.getElementById('dOrigin').textContent = d.from || '—';
+
+      document.getElementById('dStatChamp').textContent = det.championships ?? (d.wins >= 30 ? 'Multi' : '0');
+      document.getElementById('dStatChamp').style.color = (det.championships > 0) ? 'var(--gold)' : 'var(--text)';
+      document.getElementById('dStatWins').textContent = det.wins ?? d.wins;
+      document.getElementById('dStatPoles').textContent = det.poles ?? d.poles;
+      document.getElementById('dStatPodiums').textContent = det.podiums ?? 0;
+      document.getElementById('dStatStarts').textContent = det.starts ?? 0;
+
+      const races = det.races || [];
+      const posColor = p => p === 1 ? 'var(--gold)' : p === 2 ? '#C0C0C0' : p === 3 ? '#CD7F32' : p <= 10 ? 'var(--teal)' : 'var(--text-tertiary)';
+      document.getElementById('dRacesGrid').innerHTML = races.length
+        ? races.map(r => '<div class="detail-race-row"><span class="detail-race-name">' + r.name + '</span><span class="detail-race-pos" style="color:' + posColor(r.pos) + '">P' + r.pos + '</span></div>').join('')
+        : '<div style="color:var(--text-muted);font-size:11px;padding:var(--s-3);">No race data yet.</div>';
+
+      const dName = d.name.toLowerCase();
+      const abbLow = abbr.toLowerCase();
+      const vids = HIGHLIGHTS.filter(h => {
+        const t = (h.title + ' ' + (h.race || '')).toLowerCase();
+        return t.includes(dName) || t.includes(abbLow);
+      });
+      document.getElementById('dVidsGrid').innerHTML = vids.length
+        ? vids.map(v =>
+          '<div class="detail-video-item" onclick="event.stopPropagation();openVid(\'' + v.id + '\',\'' + v.title.replace(/'/g, "\\'") + '\')" onmouseover="this.style.borderColor=\'' + c + '\'" onmouseout="this.style.borderColor=\'var(--border-subtle)\'">' +
+          '<img class="detail-video-thumb" src="https://img.youtube.com/vi/' + v.id + '/mqdefault.jpg" loading="lazy">' +
+          '<div><div class="detail-video-title">' + v.title + '</div><div class="detail-video-meta">' + v.race + '</div></div></div>'
+        ).join('')
+        : '<div style="color:var(--text-muted);font-size:11px;padding:var(--s-3);">No videos found for this driver.</div>';
+
+      switchTab('bio');
+      document.getElementById('gridView').style.display = 'none';
+      document.getElementById('driverDetail').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
+
+    function backToGrid() {
+      document.getElementById('driverDetail').style.display = 'none';
+      document.getElementById('gridView').style.display = 'block';
+    }
+
+    function switchTab(tab) {
+      const tabs = ['bio', 'stats', 'races', 'videos'];
+      tabs.forEach(t => {
+        const pane = document.getElementById('pane' + t.charAt(0).toUpperCase() + t.slice(1));
+        if (pane) pane.classList.toggle('active', t === tab);
+      });
+      document.querySelectorAll('.detail-tab').forEach((el, i) => {
+        const active = tabs[i] === tab;
+        el.classList.toggle('active', active);
+        el.setAttribute('aria-selected', active);
+        el.tabIndex = active ? 0 : -1;
+      });
+    }
+
+    // ═══ HIGHLIGHT VIDEO PLAYER ═══
+    const SAMPLE_VIDEOS = [
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4'
+    ];
+    function openVid(vid, title) {
+      let hash = 0;
+      for (let i = 0; i < vid.length; i++) hash = vid.charCodeAt(i) + ((hash << 5) - hash);
+      const url = SAMPLE_VIDEOS[Math.abs(hash) % SAMPLE_VIDEOS.length];
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay open';
+      overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+      overlay.innerHTML = '<div class="modal-box" style="max-width:800px;aspect-ratio:16/9;display:flex;flex-direction:column;">' +
+        '<div class="modal-header"><span class="modal-title">' + title + '</span><button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()" aria-label="Close"><svg class="icon" width="14" height="14" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>' +
+        '<div class="modal-video" style="flex:1;background:#000;"><video controls autoplay muted style="width:100%;height:100%;object-fit:contain;" src="' + url + '"></video></div></div>';
+      document.body.appendChild(overlay);
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') {
+        const m = document.querySelector('.modal-overlay.open');
+        if (m) m.remove();
+      }
+    });
+
+    // ═══ INIT ═══
+    buildStrip();
+    buildGrid();
+
+    // Check URL hash for direct driver link
+    if (window.location.hash) {
+      const abbr = window.location.hash.replace('#', '');
+      if (DRIVERS.find(d => d.s === abbr)) showDriver(abbr);
+    }
+  </script>
+</body>
+</html>
