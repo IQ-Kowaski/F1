@@ -253,8 +253,7 @@
     <footer>
       <div class="footer-logo"><img src="f1-logo.svg" alt="F1" style="height:18px;display:inline-block;vertical-align:middle;margin-right:6px;"><em>APEX</em></div>
       <div class="footer-links">
-        <a href="https://www.formula1.com" target="_blank" rel="noopener">Official F1</a>
-        <a href="https://www.youtube.com/@F1" target="_blank" rel="noopener">F1 YouTube</a>
+        <a href="https://www.youtube.com/@Formula1" target="_blank" rel="noopener">YouTube · @Formula1</a>
         <a href="https://www.f1tv.formula1.com" target="_blank" rel="noopener">F1 TV</a>
       </div>
       <div class="footer-note">Data: 2026 F1 World Championship</div>
@@ -343,7 +342,109 @@
     }
 
     // ═══════════════════════════════════════════════
-    //  TIMING STRIP — signature element
+    //  YOUTUBE AUTO-FETCH
+    // ═══════════════════════════════════════════════
+    async function fetchYouTubeFeed() {
+      const CHANNEL_ID = 'UCB_qr75-ydFVKSF6REaZMBg';
+      const feedUrl = 'https://www.youtube.com/feeds/videos.xml?channel_id=' + CHANNEL_ID;
+      const proxies = [
+        'https://api.allorigins.win/raw?url=',
+        'https://api.allorigins.io/raw?url='
+      ];
+
+      var xml = null;
+      for (var p = 0; p < proxies.length; p++) {
+        try {
+          var ctrl = new AbortController();
+          var timer = setTimeout(function() { ctrl.abort(); }, 5000);
+          var r = await fetch(proxies[p] + encodeURIComponent(feedUrl), { signal: ctrl.signal });
+          clearTimeout(timer);
+          if (r.ok) { xml = await r.text(); break; }
+        } catch (_) {}
+      }
+      if (!xml) return;
+
+      var doc = new DOMParser().parseFromString(xml, 'text/xml');
+      var entries = doc.querySelectorAll('entry');
+      if (!entries.length) return;
+
+      var existing = new Set();
+      for (var e = 0; e < HIGHLIGHTS.length; e++) existing.add(HIGHLIGHTS[e].id);
+
+      var raceKeywords = {};
+      for (var c = 0; c < CAL.length; c++) {
+        var name = CAL[c].nm.replace(' GP', '').toLowerCase();
+        raceKeywords[name] = CAL[c];
+      }
+      raceKeywords['australian'] = CAL[0];
+      raceKeywords['spanish'] = CAL[6];
+      raceKeywords['united states'] = CAL[16];
+      raceKeywords['mexico city'] = CAL[17];
+      raceKeywords['las vegas'] = CAL[19];
+      raceKeywords['abu dhabi'] = CAL[21];
+
+      var newEntries = [];
+      for (var i = 0; i < entries.length; i++) {
+        var entry = entries[i];
+        var vid = (entry.querySelector('videoId') || entry.querySelector('id') || {}).textContent || '';
+        var title = (entry.querySelector('title') || {}).textContent || '';
+        var published = (entry.querySelector('published') || {}).textContent || '';
+
+        if (!vid || existing.has(vid)) continue;
+        if (vid.indexOf(':') > 0) {
+          var parts = vid.split(':');
+          vid = parts[parts.length - 1];
+        }
+
+        var cat = 'highlights';
+        var tag = 'Video';
+        var tLower = title.toLowerCase();
+
+        if (tLower.indexOf('sprint') >= 0) tag = 'Sprint';
+        else if (tLower.indexOf('qualifying') >= 0 || tLower.indexOf('quali') >= 0) tag = 'Qualifying';
+        else if (tLower.indexOf('race') >= 0 && tLower.indexOf('highlight') >= 0) tag = 'Race Highlight';
+        else if (tLower.indexOf('practice') >= 0 || tLower.indexOf('fp1') >= 0 || tLower.indexOf('fp2') >= 0 || tLower.indexOf('fp3') >= 0) tag = 'Practice';
+        else if (tLower.indexOf('replay') >= 0 || tLower.indexOf('classic') >= 0 || tLower.indexOf('legend') >= 0) { tag = 'Race Replay'; cat = 'replays'; }
+        else if (tLower.indexOf('onboard') >= 0 || tLower.indexOf('pole lap') >= 0) { tag = 'Onboard'; cat = 'onboards'; }
+        else if (tLower.indexOf('analysis') >= 0 || tLower.indexOf('radio') >= 0) { tag = 'Radio & Analysis'; cat = 'analysis'; }
+
+        var matchedRace = '';
+        var year = title.match(/(20\d{2})/);
+        var entryYear = year ? year[1] : '';
+        var is2026 = entryYear === '2026' || !entryYear;
+
+        if (!is2026) { cat = 'replays'; tag = 'Classic Replay'; }
+
+        for (var kw in raceKeywords) {
+          if (tLower.indexOf(kw) >= 0) {
+            var r = raceKeywords[kw];
+            matchedRace = 'Round ' + (r.rd === '✗' ? '—' : r.rd) + ' · ' + r.nm.replace(' GP', '');
+            break;
+          }
+        }
+
+        if (!matchedRace) {
+          if (tLower.indexOf('review') >= 0 || tLower.indexOf('season') >= 0 || tLower.indexOf('top 10') >= 0) {
+            matchedRace = 'Season ' + (entryYear || '2026');
+          }
+        }
+
+        newEntries.push({
+          id: vid,
+          title: title,
+          race: matchedRace || 'F1 2026',
+          tag: tag,
+          dur: '',
+          cat: cat
+        });
+        existing.add(vid);
+      }
+
+      if (newEntries.length) {
+        for (var n = 0; n < newEntries.length; n++) HIGHLIGHTS.unshift(newEntries[n]);
+        renderHL(document.querySelector('.stream-tab.active') ? HIGHLIGHTS : HIGHLIGHTS);
+      }
+    }
     // ═══════════════════════════════════════════════
     function buildTimingStrip() {
       const el = document.getElementById('stripEntries');
@@ -594,7 +695,7 @@
           ${timeout ? 'Request timed out' : 'No live sessions found'}
           <br><br>Sessions appear on race weekends.<br>
           <a href="https://www.f1tv.formula1.com" target="_blank" style="color:var(--teal)">F1 TV Pro</a> ·
-          <a href="https://www.youtube.com/@F1" target="_blank" style="color:var(--red)">F1 YouTube</a>
+          <a href="https://www.youtube.com/@Formula1" target="_blank" style="color:var(--red)">F1 YouTube</a>
         </div>`;
         status.textContent = timeout ? 'Timeout' : 'API unavailable';
       }
@@ -716,6 +817,7 @@
     buildTimingStrip();
     renderHL(HIGHLIGHTS);
     loadStreams();
+    fetchYouTubeFeed();
     fetchLiveStandings().catch(function() { buildDrivers(); buildCons(); });
   </script>
 </body>
