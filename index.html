@@ -365,7 +365,7 @@
       if (!xml) return;
 
       var doc = new DOMParser().parseFromString(xml, 'text/xml');
-      var entries = doc.querySelectorAll('entry');
+      var entries = doc.getElementsByTagNameNS('*', 'entry');
       if (!entries.length) return;
 
       function getTag(el, name) {
