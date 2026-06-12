@@ -280,17 +280,13 @@
     // ═══════════════════════════════════════════════
     function buildTimingStrip() {
       const el = document.getElementById('stripEntries');
-      const gaps = ['LEAD', '+3.2', '+5.8', '+8.1', '+10.4', '+12.9', '+14.2', '+16.7', '+18.3', '+20.1'];
-      const statuses = ['', '', '', '', '', 'PIT', '', '', '', 'OUT'];
-      el.innerHTML = DRIVERS.slice(0, 10).map((d, i) => {
+      el.innerHTML = DRIVERS.slice(0, 6).map((d, i) => {
         const c = TEAM_COLORS[d.team] || '#666';
         const posClass = i === 0 ? 'p1' : i === 1 ? 'p2' : i === 2 ? 'p3' : '';
         return `<div class="strip-entry">
           <span class="strip-pos ${posClass}">${i + 1}</span>
           <span class="strip-team-dot" style="background:${c}"></span>
           <span class="strip-driver">${d.s}</span>
-          <span class="strip-gap ${i === 0 ? 'leader' : ''}">${i === 0 ? 'LEAD' : gaps[i]}</span>
-          ${statuses[i] ? `<span class="strip-status">${statuses[i]}</span>` : ''}
         </div>`;
       }).join('');
     }
