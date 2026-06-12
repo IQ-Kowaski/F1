@@ -268,7 +268,7 @@
         <button class="modal-close" onclick="closeVid()" aria-label="Close"><svg class="icon" width="14" height="14" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="modal-video" style="flex:1;background:#000;overflow:hidden;position:relative;">
-        <video id="mVideo" controls autoplay muted style="width:100%;height:100%;object-fit:contain;"></video>
+        <iframe id="mVideoIframe" style="width:100%;height:100%;border:none;" allow="autoplay;fullscreen" allowfullscreen></iframe>
       </div>
     </div>
   </div>
@@ -395,30 +395,17 @@
     // ═══════════════════════════════════════════════
     //  VIDEO PLAYER
     // ═══════════════════════════════════════════════
-    const SAMPLE_VIDEOS = [
-      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
-      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
-      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
-      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4',
-      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4'
-    ];
-
     function openVid(vid, title) {
-      let hash = 0;
-      for (let i = 0; i < vid.length; i++) hash = vid.charCodeAt(i) + ((hash << 5) - hash);
-      const url = SAMPLE_VIDEOS[Math.abs(hash) % SAMPLE_VIDEOS.length];
       document.getElementById('mTtl').textContent = title;
-      const video = document.getElementById('mVideo');
-      if (video) { video.src = url; video.load(); video.play().catch(() => {}); }
+      const iframe = document.getElementById('mVideoIframe');
+      if (iframe) iframe.src = 'https://www.youtube.com/embed/' + vid + '?autoplay=1&rel=0';
       document.getElementById('vModal').classList.add('open');
     }
 
     function closeVid() {
       document.getElementById('vModal').classList.remove('open');
-      const v = document.getElementById('mVideo');
-      if (v) { v.pause(); v.src = ''; }
+      const iframe = document.getElementById('mVideoIframe');
+      if (iframe) iframe.src = '';
     }
 
     function mClose(e) {
