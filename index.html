@@ -282,7 +282,7 @@
       const el = document.getElementById('stripEntries');
       const gaps = ['LEAD', '+3.2', '+5.8', '+8.1', '+10.4', '+12.9', '+14.2', '+16.7', '+18.3', '+20.1'];
       const statuses = ['', '', '', '', '', 'PIT', '', '', '', 'OUT'];
-      el.innerHTML = DRIVERS.slice(0, 6).map((d, i) => {
+      el.innerHTML = DRIVERS.slice(0, 10).map((d, i) => {
         const c = TEAM_COLORS[d.team] || '#666';
         const posClass = i === 0 ? 'p1' : i === 1 ? 'p2' : i === 2 ? 'p3' : '';
         return `<div class="strip-entry">

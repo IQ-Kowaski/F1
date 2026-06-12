@@ -36,9 +36,10 @@
   <script src="data.js"></script>
   <script>
     function buildStrip() {
-      document.getElementById('stripEntries').innerHTML = DRIVERS.slice(0,6).map((d,i) => {
+      document.getElementById('stripEntries').innerHTML = DRIVERS.slice(0,10).map((d,i) => {
         const c = TEAM_COLORS[d.team]||'#666';
-        return '<div class="strip-entry"><span class="strip-pos '+(i===0?'p1':i===1?'p2':i===2?'p3':'')+'">'+(i+1)+'</span><span class="strip-team-dot" style="background:'+c+'"></span><span class="strip-driver">'+d.s+'</span></div>';
+        const gap = i===0?'LEAD':'+'+(1+i*2).toFixed(1);
+        return '<div class="strip-entry"><span class="strip-pos '+(i===0?'p1':i===1?'p2':i===2?'p3':'')+'">'+(i+1)+'</span><span class="strip-team-dot" style="background:'+c+'"></span><span class="strip-driver">'+d.s+'</span><span class="strip-gap'+(i===0?' leader':'')+'">'+gap+'</span></div>';
       }).join('');
     }
     function buildTracks() {
