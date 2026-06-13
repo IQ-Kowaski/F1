@@ -583,6 +583,15 @@
         document.getElementById('liveTxt').textContent = allMatches.length > 0 ? allMatches.length + ' Live' : 'Live';
         status.textContent = allMatches.length > 0 ? allMatches.length + ' sessions' : 'No live sessions';
         renderRows(allMatches);
+        var appleMatch = allMatches.find(function(m) { return m.sources && m.sources.some(function(s) { return (s.source || '').toLowerCase().indexOf('apple') >= 0; }); });
+        if (appleMatch) {
+          setTimeout(function() {
+            var rows = el.querySelectorAll('.stream-row');
+            for (var ri = 0; ri < allMatches.length && ri < rows.length; ri++) {
+              if (allMatches[ri] === appleMatch) { rows[ri].click(); break; }
+            }
+          }, 300);
+        }
       } catch (e) {
         const timeout = e.name === 'AbortError';
         el.innerHTML = `<div class="empty-state">
