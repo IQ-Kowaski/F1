@@ -2,6 +2,8 @@
    CIRCUIT DESIGN SYSTEM — F1 2026 Fan Portal
    ═══════════════════════════════════════════════ */
 
+@view-transition { navigation: auto; }
+
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,900;1,900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
